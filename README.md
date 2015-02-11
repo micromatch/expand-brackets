@@ -40,17 +40,15 @@ brackets.makeRe('[![:lower:]]');
 
 The following named POSIX bracket expressions are supported:
 
-| POSIX | Description | ASCII 
-| ----- |
-| `[:alnum:]` |  Alphanumeric characters |  [`a-zA-Z0-9]` |
-| `[:alpha:]` |  Alphabetic characters |  [`a-zA-Z]` |
-| `[:blank:]` |  Space and tab |  `[ t]` |
-| `[:digit:]` |  Digits |  `[0-9]` |
-| `[:lower:]` |  Lowercase letters |  `[a-z]` |
-| `[:punct:]` |  Punctuation and symbols. |  `[!"#$%&'()*+, -./:;<=>?@ [\]^_``{|}~]` |
-| `[:upper:]` |  Uppercase letters |  `[A-Z]` | 
-| `[:word:]` |  Word characters (letters, numbers and underscores) |  `[A-Za-z0-9_]` |  
-| `[:xdigit:]` |  Hexadecimal digits |  `[A-Fa-f0-9]` |  
+- `[:alnum:]`: Alphanumeric characters (`a-zA-Z0-9]`)
+- `[:alpha:]`: Alphabetic characters (`a-zA-Z]`)
+- `[:blank:]`: Space and tab (`[ t]`)
+- `[:digit:]`: Digits (`[0-9]`)
+- `[:lower:]`: Lowercase letters (`[a-z]`)
+- `[:punct:]`: Punctuation and symbols. (`[!"#$%&'()*+, -./:;<=>?@ [\]^_``{|}~]`)
+- `[:upper:]`: Uppercase letters (`[A-Z]`)
+- `[:word:]`: Word characters (letters, numbers and underscores) (`[A-Za-z0-9_]`)
+- `[:xdigit:]`: Hexadecimal digits (`[A-Fa-f0-9]`)
 
 Collating sequences are not supported, and probably won't be.
 
