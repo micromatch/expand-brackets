@@ -7,7 +7,25 @@
 
 'use strict';
 
-var chars = require('./lib/chars');
+/**
+ * POSIX character classes
+ */
+
+var POSIX = {
+  alnum: 'a-zA-Z0-9',
+  alpha: 'a-zA-Z',
+  blank: ' \\s\\t',
+  cntrl: '\\x00-\\x1F\\x7F',
+  digit: '0-9',
+  graph: '\\x21-\\x7E',
+  lower: 'a-z',
+  print: '\\x20-\\x7E',
+  punct: '!"#$%&\'()\\*+,-./:;<=>?@[\\]^_`{|}~',
+  space: ' \\s\\t\\r\\n\\v\\f',
+  upper: 'A-Z',
+  word:  'A-Za-z0-9_',
+  xdigit: 'A-Fa-f0-9',
+};
 
 /**
  * Expose `brackets`
@@ -44,7 +62,7 @@ function brackets(str) {
     }
 
     var prefix = negated ? '^' : '';
-    var ch = chars.POSIX[inner];
+    var ch = POSIX[inner];
 
     if (ch) {
       res.push('[' + prefix + ch + ']');
