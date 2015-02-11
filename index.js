@@ -1,5 +1,5 @@
 /*!
- * character-class <https://github.com/jonschlinkert/character-class>
+ * expand-brackets <https://github.com/jonschlinkert/expand-brackets>
  *
  * Copyright (c) 2015 Jon Schlinkert.
  * Licensed under the MIT license.
@@ -8,87 +8,132 @@
 'use strict';
 
 var chars = require('./lib/chars');
-var utils = require('./lib/utils');
 
 /**
- * Expose `expand`
+ * Expose `brackets`
  */
 
-module.exports = expand;
+module.exports = brackets;
 
-function expand(str) {
-  return charClass(str);
+function brackets(str) {
+  var negated = false;
+
+  if (str.indexOf('[^') !== -1) {
+    negated = true;
+    str = str.split('[^').join('[');
+  }
+  if (str.indexOf('[!') !== -1) {
+    negated = true;
+    str = str.split('[!').join('[');
+  }
+
+  var a = str.split('[');
+  var b = str.split(']');
+  var imbalanced = a.length !== b.length;
+
+  var parts = str.split(/(?::\]\[:|\[?\[:|:\]\]?)/);
+  var len = parts.length, i = 0;
+  var end = '', beg = '';
+  var res = [];
+
+  while (len--) {
+    var inner = parts[i++];
+    if (inner === '^[!' || inner === '[!') {
+      inner = '';
+      negated = true;
+    }
+
+    var prefix = negated ? '^' : '';
+    var ch = chars.POSIX[inner];
+
+    if (ch) {
+      res.push('[' + prefix + ch + ']');
+    } else if (inner) {
+      if (/^\[?\w-\w\]?$/.test(inner)) {
+        if (i === parts.length) {
+          res.push('[' + prefix + inner);
+        } else if (i === 1) {
+          res.push(prefix + inner + ']');
+        } else {
+          res.push(prefix + inner);
+        }
+      } else {
+        if (i === 1) {
+          beg += inner;
+        } else if (i === parts.length) {
+          end += inner;
+        } else {
+          res.push('[' + prefix + inner + ']');
+        }
+      }
+    }
+  }
+
+  var result = res.join('|');
+  var len = res.length || 1;
+  if (len > 1) {
+    result = '(?:' + result + ')';
+    len = 1;
+  }
+  if (beg) {
+    len++;
+    if (beg.charAt(0) === '[') {
+      if (imbalanced) {
+        beg = '\\[' + beg.slice(1);
+      } else {
+        beg += ']';
+      }
+    }
+    result = beg + result;
+  }
+  if (end) {
+    len++;
+    if (end.slice(-1) === ']') {
+      if (imbalanced) {
+        end = end.slice(0, end.length - 1) + '\\]';
+      } else {
+        end = '[' + end;
+      }
+    }
+    result += end;
+  }
+
+  if (len > 1) {
+    result = result.split('][').join(']|[');
+    if (result.indexOf('|') !== -1 && !/\(\?/.test(result)) {
+      result = '(?:' + result + ')';
+    }
+  }
+
+  result = result.replace(/\[+=|=\]+/g, '\\b');
+  return result;
 }
 
-expand.isMatch = function (str, pattern) {
+brackets.makeRe = function (pattern) {
   try {
-    return new RegExp(expand(pattern)).test(str);
+    return new RegExp(brackets(pattern));
+  } catch (err) {}
+};
+
+brackets.isMatch = function (str, pattern) {
+  try {
+    return brackets.makeRe(pattern).test(str);
   } catch (err) {
     return false;
   }
 };
 
-function charClass(glob) {
-  var re = /(\[\[?):?([^[\[\]:]*?):?(\]?\])/g;
-  return glob.replace(re, function (match, lt, inner, rt, idx) {
-    var ch = POSIX[inner];
-    var res = ch;
-    if (!ch) { return match; }
-    if (lt === '[[' && rt === ']]') {
-      return '[' + ch + ']';
-    }
-    if (lt === '[[' && rt === ']') {
-      return '[' + ch;
-    }
-    if (lt === '[' && rt === ']') {
-      return ch;
-    }
-    if (lt === '[' && rt === ']]') {
-      return ch + ']';
-    }
-    return res;
-  });
-}
+brackets.match = function (arr, pattern) {
+  var len = arr.length, i = 0;
+  var res = arr.slice();
 
-var POSIX = {
-  alnum: 'a-zA-Z0-9',
-  alpha: 'a-zA-Z',
-  blank: ' \\\\t',
-  cntrl: '\\x00-\\x1F\\x7F',
-  digit: '0-9',
-  graph: '\\x21-\\x7E',
-  lower: 'a-z',
-  print: '\\x20-\\x7E',
-  punct: utils.escapeRe('!"#$%&\'()\\*+,-./:;<=>?@[]^_`{|}~'),
-  space: '\\\\t ',
-  upper: 'A-Z',
-  xdigit: 'A-Fa-f0-9',
+  var re = brackets.makeRe(pattern);
+  while (i < len) {
+    var ele = arr[i++];
+    if (!re.test(ele)) {
+      continue;
+    }
+    res.splice(i, 1);
+  }
+  return res;
 };
-
-/**
- * Escape utils
- */
-
-function escape(str, ch) {
-  var re = ch ? chars.escapeRegex[ch] : /["\\](['"]?[^"\\]['"]?)/g;
-  return str.replace(re, function($0, $1) {
-    var o = chars[ch ? 'ESC_TEMP' : 'ESC'];
-    ch = ch ? $0 : $1;
-    var res;
-
-    if (o && (res = o[ch])) {
-      return res;
-    }
-    if (/[a-z]/i.test($0)) {
-      return $0.replace(/\\/g, '');
-    }
-
-    return $0;
-  });
-}
-
-function unescape(str) {
-  return str.replace(/__([A-Z]*)_([A-Z]*)__/g, function($0, $1) {
-    return chars[$1][$0];
-  });
-}
