@@ -18,10 +18,10 @@ describe('.isMatch()', function () {
     brackets('[[:alpha:]123]').should.equal('(?:[a-zA-Z]|[123])');
     brackets('[[:lower:]]').should.equal('[a-z]');
     brackets('[![:lower:]]').should.equal('[^a-z]');
-    brackets('[[:digit:][:upper:][:space:]]').should.equal('(?:[0-9]|[A-Z]|[ \\s\\t\\r\\n\\v\\f])');
+    brackets('[[:digit:][:upper:][:space:]]').should.equal('(?:[0-9]|[A-Z]|[ \\t\\r\\n\\v\\f])');
     brackets('[[:xdigit:]]').should.equal('[A-Fa-f0-9]');
-    brackets('[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]').should.equal('(?:[a-zA-Z0-9]|[a-zA-Z]|[ \\s\\t]|[\\x00-\\x1F\\x7F]|[0-9]|[\\x21-\\x7E]|[a-z]|[\\x20-\\x7E]|[!"#$%&\'()\\*+,-./:;<=>?@[\\]^_`{|}~]|[ \\s\\t\\r\\n\\v\\f]|[A-Z]|[A-Fa-f0-9])');
-    brackets('[^[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:lower:][:space:][:upper:][:xdigit:]]').should.equal('(?:[^a-zA-Z0-9]|[^a-zA-Z]|[^ \\s\\t]|[^\\x00-\\x1F\\x7F]|[^0-9]|[^a-z]|[^ \\s\\t\\r\\n\\v\\f]|[^A-Z]|[^A-Fa-f0-9])');
+    brackets('[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]').should.equal('(?:[a-zA-Z0-9]|[a-zA-Z]|[ \\t]|[\\x00-\\x1F\\x7F]|[0-9]|[\\x21-\\x7E]|[a-z]|[\\x20-\\x7E]|[!"#$%&\'()\\*+,-./:;<=>?@[\\]^_`{|}~]|[ \\t\\r\\n\\v\\f]|[A-Z]|[A-Fa-f0-9])');
+    brackets('[^[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:lower:][:space:][:upper:][:xdigit:]]').should.equal('(?:[^a-zA-Z0-9]|[^a-zA-Z]|[^ \\t]|[^\\x00-\\x1F\\x7F]|[^0-9]|[^a-z]|[^ \\t\\r\\n\\v\\f]|[^A-Z]|[^A-Fa-f0-9])');
     brackets('[a-c[:digit:]x-z]').should.equal('(?:[a-c]|[0-9]|[x-z])');
   });
 
