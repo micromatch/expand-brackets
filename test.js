@@ -1,12 +1,6 @@
-/*!
- * expand-brackets <https://github.com/jonschlinkert/expand-brackets>
- *
- * Copyright (c) 2015, Jon Schlinkert.
- * Licensed under the MIT License
- */
-
 'use strict';
 
+/* deps: mocha */
 var path = require('path');
 var should = require('should');
 var brackets = require('./');
