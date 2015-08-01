@@ -7,6 +7,8 @@
 
 'use strict';
 
+var isPosixBracket = require('is-posix-bracket');
+
 /**
  * POSIX character classes
  */
@@ -34,8 +36,11 @@ var POSIX = {
 module.exports = brackets;
 
 function brackets(str) {
-  var negated = false;
+  if (!isPosixBracket(str)) {
+    return str;
+  }
 
+  var negated = false;
   if (str.indexOf('[^') !== -1) {
     negated = true;
     str = str.split('[^').join('[');
@@ -54,6 +59,7 @@ function brackets(str) {
   var end = '', beg = '';
   var res = [];
 
+  // start at the end (innermost) first
   while (len--) {
     var inner = parts[i++];
     if (inner === '^[!' || inner === '[!') {
@@ -88,13 +94,13 @@ function brackets(str) {
   }
 
   var result = res.join('|');
-  var len = res.length || 1;
-  if (len > 1) {
+  var rlen = res.length || 1;
+  if (rlen > 1) {
     result = '(?:' + result + ')';
-    len = 1;
+    rlen = 1;
   }
   if (beg) {
-    len++;
+    rlen++;
     if (beg.charAt(0) === '[') {
       if (imbalanced) {
         beg = '\\[' + beg.slice(1);
@@ -105,7 +111,7 @@ function brackets(str) {
     result = beg + result;
   }
   if (end) {
-    len++;
+    rlen++;
     if (end.slice(-1) === ']') {
       if (imbalanced) {
         end = end.slice(0, end.length - 1) + '\\]';
@@ -116,7 +122,7 @@ function brackets(str) {
     result += end;
   }
 
-  if (len > 1) {
+  if (rlen > 1) {
     result = result.split('][').join(']|[');
     if (result.indexOf('|') !== -1 && !/\(\?/.test(result)) {
       result = '(?:' + result + ')';
