@@ -6,6 +6,7 @@ var should = require('should');
 var brackets = require('./');
 
 describe('.isMatch()', function () {
+  
   it('should create the equivalent character classes:', function () {
     brackets('foo[[:lower:]]bar').should.equal('foo[a-z]bar');
     brackets('foo[[:lower:][:upper:]]bar').should.equal('foo(?:[a-z]|[A-Z])bar');
