@@ -6,7 +6,7 @@ var should = require('should');
 var brackets = require('./');
 
 describe('.isMatch()', function () {
-  
+
   it('should create the equivalent character classes:', function () {
     brackets('foo[[:lower:]]bar').should.equal('foo[a-z]bar');
     brackets('foo[[:lower:][:upper:]]bar').should.equal('foo(?:[a-z]|[A-Z])bar');
@@ -15,14 +15,15 @@ describe('.isMatch()', function () {
     brackets('[![:lower:]]').should.equal('[^a-z]');
     brackets('[[:digit:][:upper:][:space:]]').should.equal('(?:[0-9]|[A-Z]|[ \\t\\r\\n\\v\\f])');
     brackets('[[:xdigit:]]').should.equal('[A-Fa-f0-9]');
-    brackets('[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]').should.equal('(?:[a-zA-Z0-9]|[a-zA-Z]|[ \\t]|[\\x00-\\x1F\\x7F]|[0-9]|[\\x21-\\x7E]|[a-z]|[\\x20-\\x7E]|[!"#$%&\'()\\*+,-./:;<=>?@[\\]^_`{|}~]|[ \\t\\r\\n\\v\\f]|[A-Z]|[A-Fa-f0-9])');
+    brackets('[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]').should.equal('(?:[a-zA-Z0-9]|[a-zA-Z]|[' +
+        ' \\t]|[\\x00-\\x1F\\x7F]|[0-9]|[\\x21-\\x7E]|[a-z]|[\\x20-\\x7E]|[-!"#$%&\'()\\*+,./:;<=>?@[\\]^_`{|}~]|[ \\t\\r\\n\\v\\f]|[A-Z]|[A-Fa-f0-9])');
     brackets('[^[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:lower:][:space:][:upper:][:xdigit:]]').should.equal('(?:[^a-zA-Z0-9]|[^a-zA-Z]|[^ \\t]|[^\\x00-\\x1F\\x7F]|[^0-9]|[^a-z]|[^ \\t\\r\\n\\v\\f]|[^A-Z]|[^A-Fa-f0-9])');
     brackets('[a-c[:digit:]x-z]').should.equal('(?:[a-c]|[0-9]|[x-z])');
   });
 
   it('should not create an invalid posix character class:', function () {
     brackets('[:al:]').should.equal('[al]');
-    brackets('[abc[:punct:][0-9]').should.equal('\\[abc(?:[!"#$%&\'()\\*+,-./:;<=>?@[\\]^_`{|}~]|[[0-9])');
+    brackets('[abc[:punct:][0-9]').should.equal('\\[abc(?:[-!"#$%&\'()\\*+,./:;<=>?@[\\]^_`{|}~]|[[0-9])');
   });
 
   it('should return `true` when the pattern matches:', function () {
