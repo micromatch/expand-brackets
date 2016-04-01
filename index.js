@@ -133,13 +133,13 @@ function brackets(str) {
   return result;
 }
 
-brackets.makeRe = function (pattern) {
+brackets.makeRe = function(pattern) {
   try {
     return new RegExp(brackets(pattern));
   } catch (err) {}
 };
 
-brackets.isMatch = function (str, pattern) {
+brackets.isMatch = function(str, pattern) {
   try {
     return brackets.makeRe(pattern).test(str);
   } catch (err) {
@@ -147,7 +147,7 @@ brackets.isMatch = function (str, pattern) {
   }
 };
 
-brackets.match = function (arr, pattern) {
+brackets.match = function(arr, pattern) {
   var len = arr.length, i = 0;
   var res = arr.slice();
 

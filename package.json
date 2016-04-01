@@ -1,8 +1,8 @@
 {
   "name": "expand-brackets",
   "description": "Expand POSIX bracket expressions (character classes) in glob patterns.",
-  "homepage": "https://github.com/jonschlinkert/expand-brackets",
   "version": "0.1.3",
+  "homepage": "https://github.com/jonschlinkert/expand-brackets",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "repository": "jonschlinkert/expand-brackets",
   "bugs": {
@@ -23,6 +23,7 @@
     "is-posix-bracket": "^0.1.0"
   },
   "devDependencies": {
+    "gulp-format-md": "^0.1.7",
     "mocha": "^2.2.5",
     "should": "^7.0.2"
   },
@@ -33,14 +34,29 @@
     "posix"
   ],
   "verb": {
+    "run": true,
+    "toc": false,
+    "layout": "default",
+    "tasks": [
+      "readme"
+    ],
+    "plugins": [
+      "gulp-format-md"
+    ],
     "related": {
       "list": [
         "extglob",
-        "micromatch",
-        "is-glob",
         "is-extglob",
-        "is-posix-bracket"
+        "is-glob",
+        "is-posix-bracket",
+        "micromatch"
       ]
+    },
+    "reflinks": [
+      "verb"
+    ],
+    "lint": {
+      "reflinks": true
     }
   }
 }
