@@ -4,13 +4,21 @@
   "version": "0.1.5",
   "homepage": "https://github.com/jonschlinkert/expand-brackets",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
+  "contributors": [
+    "Elan Shanker (https://github.com/es128)",
+    "Eugene Sharygin (https://github.com/eush77)",
+    "Jon Schlinkert <jon.schlinkert@sellside.com> (http://twitter.com/jonschlinkert)",
+    "Martin Kolárik <martin@kolarik.sk> (http://kolarik.sk)"
+  ],
   "repository": "jonschlinkert/expand-brackets",
   "bugs": {
     "url": "https://github.com/jonschlinkert/expand-brackets/issues"
   },
   "license": "MIT",
   "files": [
-    "index.js"
+    "index.js",
+    "LICENSE",
+    "README.md"
   ],
   "main": "index.js",
   "engines": {
@@ -29,7 +37,9 @@
   },
   "keywords": [
     "bracket",
+    "brackets",
     "character class",
+    "expand",
     "expression",
     "posix"
   ],
