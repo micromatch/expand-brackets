@@ -1,163 +1,149 @@
-/*!
- * expand-brackets <https://github.com/jonschlinkert/expand-brackets>
- *
- * Copyright (c) 2015 Jon Schlinkert.
- * Licensed under the MIT license.
- */
-
 'use strict';
 
-var isPosixBracket = require('is-posix-bracket');
-
-/**
- * POSIX character classes
- */
-
-var POSIX = {
-  alnum: 'a-zA-Z0-9',
-  alpha: 'a-zA-Z',
-  blank: ' \\t',
-  cntrl: '\\x00-\\x1F\\x7F',
-  digit: '0-9',
-  graph: '\\x21-\\x7E',
-  lower: 'a-z',
-  print: '\\x20-\\x7E',
-  punct: '-!"#$%&\'()\\*+,./:;<=>?@[\\]^_`{|}~',
-  space: ' \\t\\r\\n\\v\\f',
-  upper: 'A-Z',
-  word:  'A-Za-z0-9_',
-  xdigit: 'A-Fa-f0-9',
-};
+var debug = require('debug')('expand-brackets');
+var Brackets = require('./lib/brackets');
+var compilers = require('./lib/compilers');
+var parsers = require('./lib/parsers');
+var utils = require('./lib/utils');
 
 /**
  * Expose `brackets`
+ * @type {Function}
  */
 
-module.exports = brackets;
-
-function brackets(str) {
-  if (!isPosixBracket(str)) {
-    return str;
-  }
-
-  var negated = false;
-  if (str.indexOf('[^') !== -1) {
-    negated = true;
-    str = str.split('[^').join('[');
-  }
-  if (str.indexOf('[!') !== -1) {
-    negated = true;
-    str = str.split('[!').join('[');
-  }
-
-  var a = str.split('[');
-  var b = str.split(']');
-  var imbalanced = a.length !== b.length;
-
-  var parts = str.split(/(?::\]\[:|\[?\[:|:\]\]?)/);
-  var len = parts.length, i = 0;
-  var end = '', beg = '';
-  var res = [];
-
-  // start at the end (innermost) first
-  while (len--) {
-    var inner = parts[i++];
-    if (inner === '^[!' || inner === '[!') {
-      inner = '';
-      negated = true;
-    }
-
-    var prefix = negated ? '^' : '';
-    var ch = POSIX[inner];
-
-    if (ch) {
-      res.push('[' + prefix + ch + ']');
-    } else if (inner) {
-      if (/^\[?\w-\w\]?$/.test(inner)) {
-        if (i === parts.length) {
-          res.push('[' + prefix + inner);
-        } else if (i === 1) {
-          res.push(prefix + inner + ']');
-        } else {
-          res.push(prefix + inner);
-        }
-      } else {
-        if (i === 1) {
-          beg += inner;
-        } else if (i === parts.length) {
-          end += inner;
-        } else {
-          res.push('[' + prefix + inner + ']');
-        }
-      }
-    }
-  }
-
-  var result = res.join('|');
-  var rlen = res.length || 1;
-  if (rlen > 1) {
-    result = '(?:' + result + ')';
-    rlen = 1;
-  }
-  if (beg) {
-    rlen++;
-    if (beg.charAt(0) === '[') {
-      if (imbalanced) {
-        beg = '\\[' + beg.slice(1);
-      } else {
-        beg += ']';
-      }
-    }
-    result = beg + result;
-  }
-  if (end) {
-    rlen++;
-    if (end.slice(-1) === ']') {
-      if (imbalanced) {
-        end = end.slice(0, end.length - 1) + '\\]';
-      } else {
-        end = '[' + end;
-      }
-    }
-    result += end;
-  }
-
-  if (rlen > 1) {
-    result = result.split('][').join(']|[');
-    if (result.indexOf('|') !== -1 && !/\(\?/.test(result)) {
-      result = '(?:' + result + ')';
-    }
-  }
-
-  result = result.replace(/\[+=|=\]+/g, '\\b');
-  return result;
+function posix(pattern, options) {
+  var brackets = new Brackets();
+  var ast = brackets.parse(pattern, options);
+  var res = brackets.compile(ast, options);
+  return res;
 }
 
-brackets.makeRe = function(pattern) {
-  try {
-    return new RegExp(brackets(pattern));
-  } catch (err) {}
-};
+/**
+ * Takes an array of strings and an brackets pattern and returns a new
+ * array that contains only the strings that match the pattern.
+ *
+ * ```js
+ * var brackets = require('expand-brackets');
+ * console.log(brackets.match(['1', 'a', 'ab'], '[[:alpha:]]'));
+ * //=> ['a']
+ *
+ * console.log(brackets.match(['1', 'a', 'ab'], '[[:alpha:]]+'));
+ * //=> ['a', 'ab']
+ * ```
+ * @param {Array} `arr` Array of strings to match
+ * @param {String} `pattern` Poxis pattern
+ * @param {Object} `options`
+ * @return {Array}
+ * @api public
+ */
 
-brackets.isMatch = function(str, pattern) {
-  try {
-    return brackets.makeRe(pattern).test(str);
-  } catch (err) {
-    return false;
-  }
-};
+posix.match = function(arr, pattern, options) {
+  arr = [].concat(arr);
+  var opts = utils.extend({}, options);
+  var isMatch = posix.matcher(pattern, opts);
+  var len = arr.length;
+  var idx = -1;
+  var res = [];
 
-brackets.match = function(arr, pattern) {
-  var len = arr.length, i = 0;
-  var res = arr.slice();
-
-  var re = brackets.makeRe(pattern);
-  while (i < len) {
-    var ele = arr[i++];
-    if (!re.test(ele)) {
-      continue;
+  while (++idx < len) {
+    var ele = arr[idx];
+    if (isMatch(ele)) {
+      res.push(ele);
     }
-    res.splice(i, 1);
+  }
+
+  if (res.length === 0) {
+    if (opts.failglob === true) {
+      throw new Error('no matches found for "' + pattern + '"');
+    }
+    if (opts.nonull === true || opts.nullglob === true) {
+      return [pattern.split('\\').join('')];
+    }
   }
   return res;
 };
+
+/**
+ * Returns true if the specified `string` matches the given
+ * brackets `pattern`.
+ *
+ * ```js
+ * var brackets = require('expand-brackets');
+ *
+ * console.log(brackets.isMatch('a.a', '[[:alpha:]].[[:alpha:]]'));
+ * //=> true
+ * console.log(brackets.isMatch('1.2', '[[:alpha:]].[[:alpha:]]'));
+ * //=> false
+ * ```
+ * @param {String} `string` String to match
+ * @param {String} `pattern` Poxis pattern
+ * @param {String} `options`
+ * @return {Boolean}
+ * @api public
+ */
+
+posix.isMatch = function(str, pattern, options) {
+  return posix.matcher(pattern, options)(str);
+};
+
+/**
+ * Takes an brackets pattern and returns a matcher function. The returned
+ * function takes the string to match as its only argument.
+ *
+ * ```js
+ * var brackets = require('expand-brackets');
+ * var isMatch = brackets.matcher('[[:lower:]].[[:upper:]]');
+ *
+ * console.log(isMatch('a.a'));
+ * //=> false
+ * console.log(isMatch('a.A'));
+ * //=> true
+ * ```
+ * @param {String} `pattern` Poxis pattern
+ * @param {String} `options`
+ * @return {Boolean}
+ * @api public
+ */
+
+posix.matcher = function(pattern, options) {
+  var re = posix.makeRe(pattern, options);
+  return function(str) {
+    return re.test(str);
+  };
+};
+
+/**
+ * Create a regular expression from the given string `pattern`.
+ *
+ * ```js
+ * var brackets = require('expand-brackets');
+ * var re = brackets.makeRe('[[:alpha:]]');
+ * console.log(re);
+ * //=> /^(?:[a-zA-Z])$/
+ * ```
+ * @param {String} `pattern` The pattern to convert to regex.
+ * @param {Object} `options`
+ * @return {RegExp}
+ * @api public
+ */
+
+posix.makeRe = function(pattern, options) {
+  var brackets = new Brackets(options);
+  return brackets.makeRe(pattern);
+};
+
+/**
+ * Expose `Poxis`
+ * @type {Function}
+ */
+
+module.exports = posix;
+
+/**
+ * Expose `Poxis` constructor
+ * @type {Function}
+ */
+
+module.exports.Brackets = Brackets;
+module.exports.compilers = compilers;
+module.exports.parsers = parsers;
