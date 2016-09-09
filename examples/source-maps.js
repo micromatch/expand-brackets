@@ -1,7 +1,7 @@
 'use strict';
 
-var brackes = require('..');
+var brackets = require('..');
 var pattern = '[:alpha:]';
 
-var res = brackes(pattern, {sourcemap: true});
+var res = brackets(pattern, {sourcemap: true});
 console.log(res);
