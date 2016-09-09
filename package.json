@@ -17,9 +17,7 @@
   "license": "MIT",
   "files": [
     "index.js",
-    "lib",
-    "LICENSE",
-    "README.md"
+    "lib"
   ],
   "main": "index.js",
   "engines": {
@@ -32,15 +30,12 @@
     "debug": "^2.2.0",
     "define-property": "^0.2.5",
     "extend-shallow": "^2.0.1",
-    "snapdragon": "^0.5.0",
-    "source-map": "^0.5.6",
-    "source-map-resolve": "^0.5.0",
-    "urix": "^0.1.0"
+    "snapdragon": "^0.6.0"
   },
   "devDependencies": {
-    "gulp-format-md": "^0.1.7",
+    "gulp-format-md": "^0.1.10",
     "minimatch": "^3.0.3",
-    "mocha": "^2.2.5",
+    "mocha": "^3.0.2",
     "yargs-parser": "^3.2.0"
   },
   "keywords": [
@@ -63,11 +58,10 @@
     ],
     "related": {
       "list": [
+        "braces",
         "extglob",
-        "is-extglob",
-        "is-glob",
-        "is-posix-bracket",
-        "micromatch"
+        "micromatch",
+        "nanomatch"
       ]
     },
     "reflinks": [
