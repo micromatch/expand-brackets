@@ -19,7 +19,10 @@ describe('brackets', function() {
     assert(isMatch('e', '[[:xdigit:]]'));
     assert(isMatch('a', '[[:alpha:]123]'));
     assert(isMatch('1', '[[:alpha:]123]'));
+    assert(!isMatch('4', '[[:alpha:]123]'));
     assert(isMatch('9', '[![:alpha:]]'));
+    assert(isMatch('9', '[^[:alpha:]]'));
+    assert(isMatch('9', '[[:digit:]]'));
   });
 
   it('should create the equivalent regex character classes for POSIX expressions:', function() {
@@ -208,6 +211,11 @@ describe('POSIX: From the test suite for the POSIX.2 (BRE) pattern matching code
   it('should match the first two characters of a valid sh identifier', function() {
     assert(isMatch('PATH', '[_[:alpha:]][_[:alnum:]]*'));
   });
+
+  /**
+   * Some of these tests (and their descriptions) were ported directly
+   * from the Bash 4.3 unit tests.
+   */
 
   it('how about A?', function() {
     assert(isMatch('9', '[[:digit:]]'));
