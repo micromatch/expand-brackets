@@ -4,13 +4,20 @@
   "version": "0.1.5",
   "homepage": "https://github.com/jonschlinkert/expand-brackets",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
+  "contributors": [
+    "Elan Shanker (https://github.com/es128)",
+    "Eugene Sharygin (https://github.com/eush77)",
+    "Jon Schlinkert <jon.schlinkert@sellside.com> (http://twitter.com/jonschlinkert)",
+    "Martin Kolárik <martin@kolarik.sk> (http://kolarik.sk)"
+  ],
   "repository": "jonschlinkert/expand-brackets",
   "bugs": {
     "url": "https://github.com/jonschlinkert/expand-brackets/issues"
   },
   "license": "MIT",
   "files": [
-    "index.js"
+    "index.js",
+    "lib"
   ],
   "main": "index.js",
   "engines": {
@@ -20,16 +27,26 @@
     "test": "mocha"
   },
   "dependencies": {
-    "is-posix-bracket": "^0.1.0"
+    "debug": "^2.2.0",
+    "define-property": "^0.2.5",
+    "extend-shallow": "^2.0.1",
+    "posix-character-classes": "^0.1.0",
+    "regex-not": "^0.1.2",
+    "snapdragon": "^0.7.0",
+    "to-regex": "^0.1.1"
   },
   "devDependencies": {
-    "gulp-format-md": "^0.1.7",
-    "mocha": "^2.2.5",
-    "should": "^7.0.2"
+    "gulp-format-md": "^0.1.10",
+    "helper-changelog": "^0.3.0",
+    "minimatch": "^3.0.3",
+    "mocha": "^3.0.2",
+    "yargs-parser": "^4.0.0"
   },
   "keywords": [
     "bracket",
+    "brackets",
     "character class",
+    "expand",
     "expression",
     "posix"
   ],
@@ -43,17 +60,21 @@
     "plugins": [
       "gulp-format-md"
     ],
+    "helpers": [
+      "helper-changelog"
+    ],
     "related": {
       "list": [
+        "braces",
         "extglob",
-        "is-extglob",
-        "is-glob",
-        "is-posix-bracket",
-        "micromatch"
+        "micromatch",
+        "nanomatch"
       ]
     },
     "reflinks": [
-      "verb"
+      "verb",
+      "micromatch",
+      "verb-generate-readme"
     ],
     "lint": {
       "reflinks": true

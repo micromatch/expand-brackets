@@ -7,38 +7,177 @@
 Install with [npm](https://www.npmjs.com/):
 
 ```sh
-$ npm install expand-brackets --save
+$ npm install --save expand-brackets
 ```
 
 ## Usage
 
 ```js
 var brackets = require('expand-brackets');
+brackets(string[, options]);
+```
 
-brackets('[![:lower:]]');
+**Params**
+
+The main export is a function that takes the following parameters:
+
+* `pattern` **{String}**: the pattern to convert
+* `options` **{Object}**: optionally supply an options object
+* `returns` **{String}**: returns a string that can be used to create a regex
+
+**Example**
+
+```js
+console.log(brackets('[![:lower:]]'));
 //=> '[^a-z]'
 ```
 
-## .isMatch
+## API
 
-Return true if the given string matches the bracket expression:
+### [brackets](index.js#L55)
+
+Parses the given POSIX character class `pattern` and returns an object with the compiled `output` and optional source `map`.
+
+**Params**
+
+* `pattern` **{String}**
+* `options` **{Object}**
+* `returns` **{Object}**
+
+**Example**
 
 ```js
-brackets.isMatch('A', '[![:lower:]]');
-//=> true
+var brackets = require('expand-brackets');
+console.log(brackets('[[:alpha:]]'));
+// { options: { source: 'string' },
+//   input: '[[:alpha:]]',
+//   state: {},
+//   compilers:
+//    { eos: [Function],
+//      noop: [Function],
+//      bos: [Function],
+//      not: [Function],
+//      escape: [Function],
+//      text: [Function],
+//      posix: [Function],
+//      bracket: [Function],
+//      'bracket.open': [Function],
+//      'bracket.inner': [Function],
+//      'bracket.literal': [Function],
+//      'bracket.close': [Function] },
+//   output: '[a-zA-Z]',
+//   ast:
+//    { type: 'root',
+//      errors: [],
+//      nodes: [ [Object], [Object], [Object] ] },
+//   parsingErrors: [] }
+```
 
-brackets.isMatch('a', '[![:lower:]]');
+### [.match](index.js#L85)
+
+Takes an array of strings and a POSIX character class pattern, and returns a new array with only the strings that matched the pattern.
+
+**Params**
+
+* `arr` **{Array}**: Array of strings to match
+* `pattern` **{String}**: POSIX character class pattern(s)
+* `options` **{Object}**
+* `returns` **{Array}**
+
+**Example**
+
+```js
+var brackets = require('expand-brackets');
+console.log(brackets.match(['1', 'a', 'ab'], '[[:alpha:]]'));
+//=> ['a']
+
+console.log(brackets.match(['1', 'a', 'ab'], '[[:alpha:]]+'));
+//=> ['a', 'ab']
+```
+
+### [.isMatch](index.js#L131)
+
+Returns true if the specified `string` matches the given brackets `pattern`.
+
+**Params**
+
+* `string` **{String}**: String to match
+* `pattern` **{String}**: Poxis pattern
+* `options` **{String}**
+* `returns` **{Boolean}**
+
+**Example**
+
+```js
+var brackets = require('expand-brackets');
+
+console.log(brackets.isMatch('a.a', '[[:alpha:]].[[:alpha:]]'));
+//=> true
+console.log(brackets.isMatch('1.2', '[[:alpha:]].[[:alpha:]]'));
 //=> false
 ```
 
-## .makeRe
+### [.matcher](index.js#L154)
 
-Make a regular expression from a bracket expression:
+Takes a POSIX character class pattern and returns a matcher function. The returned function takes the string to match as its only argument.
+
+**Params**
+
+* `pattern` **{String}**: Poxis pattern
+* `options` **{String}**
+* `returns` **{Boolean}**
+
+**Example**
 
 ```js
-brackets.makeRe('[![:lower:]]');
-//=> /[^a-z]/
+var brackets = require('expand-brackets');
+var isMatch = brackets.matcher('[[:lower:]].[[:upper:]]');
+
+console.log(isMatch('a.a'));
+//=> false
+console.log(isMatch('a.A'));
+//=> true
 ```
+
+### [.makeRe](index.js#L176)
+
+Create a regular expression from the given `pattern`.
+
+**Params**
+
+* `pattern` **{String}**: The pattern to convert to regex.
+* `options` **{Object}**
+* `returns` **{RegExp}**
+
+**Example**
+
+```js
+var brackets = require('expand-brackets');
+var re = brackets.makeRe('[[:alpha:]]');
+console.log(re);
+//=> /^(?:[a-zA-Z])$/
+```
+
+## Options
+
+### options.sourcemap
+
+Generate a source map for the given pattern.
+
+**Example**
+
+```js
+var res = brackets('[:alpha:]', {sourcemap: true});
+
+console.log(res.map);
+// { version: 3,
+//   sources: [ 'brackets' ],
+//   names: [],
+//   mappings: 'AAAA,MAAS',
+//   sourcesContent: [ '[:alpha:]' ] }
+```
+
+### POSIX Character classes
 
 The following named POSIX bracket expressions are supported:
 
@@ -52,37 +191,72 @@ The following named POSIX bracket expressions are supported:
 * `[:word:]`: Word characters (letters, numbers and underscores) (`[A-Za-z0-9_]`)
 * `[:xdigit:]`: Hexadecimal digits (`[A-Fa-f0-9]`)
 
-Collating sequences are not supported.
+See [posix-character-classes](https://github.com/jonschlinkert/posix-character-classes) for more details.
 
-## Related projects
+**Not supported**
 
-You might also be interested in these projects:
+* [equivalence classes](https://www.gnu.org/software/gawk/manual/html_node/Bracket-Expressions.html) are not supported
+* [POSIX.2 collating symbols](https://www.gnu.org/software/gawk/manual/html_node/Bracket-Expressions.html) are not supported
 
-* [extglob](https://www.npmjs.com/package/extglob): Convert extended globs to regex-compatible strings. Add (almost) the expressive power of regular expressions to… [more](https://www.npmjs.com/package/extglob) | [homepage](https://github.com/jonschlinkert/extglob)
-* [is-extglob](https://www.npmjs.com/package/is-extglob): Returns true if a string has an extglob. | [homepage](https://github.com/jonschlinkert/is-extglob)
-* [is-glob](https://www.npmjs.com/package/is-glob): Returns `true` if the given string looks like a glob pattern or an extglob pattern.… [more](https://www.npmjs.com/package/is-glob) | [homepage](https://github.com/jonschlinkert/is-glob)
-* [is-posix-bracket](https://www.npmjs.com/package/is-posix-bracket): Returns true if the given string is a POSIX bracket expression (POSIX character class). | [homepage](https://github.com/jonschlinkert/is-posix-bracket)
-* [micromatch](https://www.npmjs.com/package/micromatch): Glob matching for javascript/node.js. A drop-in replacement and faster alternative to minimatch and multimatch. Just… [more](https://www.npmjs.com/package/micromatch) | [homepage](https://github.com/jonschlinkert/micromatch)
+## Changelog
 
-## Contributing
+### v0.2.0
 
-Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/jonschlinkert/expand-brackets/issues/new).
+In addition to performance and matching improvements, the v0.2.0 refactor adds complete POSIX character class support, with the exception of equivalence classes and POSIX.2 collating symbols which are not relevant to node.js usage.
 
-## Building docs
+**Added features**
 
-Generate readme and API documentation with [verb](https://github.com/verbose/verb):
+* parser is exposed, so that expand-brackets parsers can be used by upstream parsers (like [micromatch](https://github.com/jonschlinkert/micromatch))
+* compiler is exposed, so that expand-brackets compilers can be used by upstream compilers
+* source maps
 
-```sh
-$ npm install verb && npm run docs
+**source map example**
+
+```js
+var brackets = require('expand-brackets');
+var res = brackets('[:alpha:]');
+console.log(res.map);
+
+{ version: 3,
+     sources: [ 'brackets' ],
+     names: [],
+     mappings: 'AAAA,MAAS',
+     sourcesContent: [ '[:alpha:]' ] }
 ```
 
-Or, if [verb](https://github.com/verbose/verb) is installed globally:
+## About
+
+### Related projects
+
+* [braces](https://www.npmjs.com/package/braces): Fastest brace expansion for node.js, with the most complete support for the Bash 4.3 braces… [more](https://github.com/jonschlinkert/braces) | [homepage](https://github.com/jonschlinkert/braces "Fastest brace expansion for node.js, with the most complete support for the Bash 4.3 braces specification.")
+* [extglob](https://www.npmjs.com/package/extglob): Convert extended globs to regex-compatible strings. Add (almost) the expressive power of regular expressions to… [more](https://github.com/jonschlinkert/extglob) | [homepage](https://github.com/jonschlinkert/extglob "Convert extended globs to regex-compatible strings. Add (almost) the expressive power of regular expressions to glob patterns.")
+* [micromatch](https://www.npmjs.com/package/micromatch): Glob matching for javascript/node.js. A drop-in replacement and faster alternative to minimatch and multimatch. | [homepage](https://github.com/jonschlinkert/micromatch "Glob matching for javascript/node.js. A drop-in replacement and faster alternative to minimatch and multimatch.")
+* [nanomatch](https://www.npmjs.com/package/nanomatch): Fast, minimal glob matcher for node.js.  | [homepage](https://github.com/jonschlinkert/nanomatch "Fast, minimal glob matcher for node.js. ")
+
+### Contributing
+
+Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](../../issues/new).
+
+### Contributors
+
+| **Commits** | **Contributor**<br/> | 
+| --- | --- |
+| 17 | [jonschlinkert](https://github.com/jonschlinkert) |
+| 2 | [MartinKolarik](https://github.com/MartinKolarik) |
+| 2 | [es128](https://github.com/es128) |
+| 1 | [eush77](https://github.com/eush77) |
+
+### Building docs
+
+_(This document was generated by [verb-generate-readme](https://github.com/verbose/verb-generate-readme) (a [verb](https://github.com/verbose/verb) generator), please don't edit the readme directly. Any changes to the readme must be made in [.verb.md](.verb.md).)_
+
+To generate the readme and API documentation with [verb](https://github.com/verbose/verb):
 
 ```sh
-$ verb
+$ npm install -g verb verb-generate-readme && verb
 ```
 
-## Running tests
+### Running tests
 
 Install dev dependencies:
 
@@ -90,18 +264,18 @@ Install dev dependencies:
 $ npm install -d && npm test
 ```
 
-## Author
+### Author
 
 **Jon Schlinkert**
 
 * [github/jonschlinkert](https://github.com/jonschlinkert)
 * [twitter/jonschlinkert](http://twitter.com/jonschlinkert)
 
-## License
+### License
 
-verb © 2016, [Jon Schlinkert](https://github.com/jonschlinkert).
+Copyright © 2016, [Jon Schlinkert](https://github.com/jonschlinkert).
 Released under the [MIT license](https://github.com/jonschlinkert/expand-brackets/blob/master/LICENSE).
 
 ***
 
-_This file was generated by [verb](https://github.com/verbose/verb), v, on April 01, 2016._
+_This file was generated by [verb-generate-readme](https://github.com/verbose/verb-generate-readme), v0.1.31, on September 27, 2016._
