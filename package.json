@@ -30,13 +30,14 @@
     "debug": "^2.2.0",
     "define-property": "^0.2.5",
     "extend-shallow": "^2.0.1",
-    "snapdragon": "^0.6.0"
+    "snapdragon": "^0.7.0",
+    "to-regex": "^0.1.1"
   },
   "devDependencies": {
     "gulp-format-md": "^0.1.10",
     "minimatch": "^3.0.3",
     "mocha": "^3.0.2",
-    "yargs-parser": "^3.2.0"
+    "yargs-parser": "^4.0.0"
   },
   "keywords": [
     "bracket",
