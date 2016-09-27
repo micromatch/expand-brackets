@@ -1,7 +1,9 @@
 'use strict';
 
 var debug = require('debug')('expand-brackets');
-var Brackets = require('./lib/brackets');
+var extend = require('extend-shallow');
+var toRegex = require('to-regex');
+var Snapdragon = require('snapdragon');
 var compilers = require('./lib/compilers');
 var parsers = require('./lib/parsers');
 var utils = require('./lib/utils');
@@ -11,10 +13,13 @@ var utils = require('./lib/utils');
  * @type {Function}
  */
 
-function posix(pattern, options) {
-  var brackets = new Brackets();
-  var ast = brackets.parse(pattern, options);
-  var res = brackets.compile(ast, options);
+function brackets(pattern, options) {
+  debug('initializing from <%s>', __filename);
+  var snapdragon = new Snapdragon(options);
+  compilers(snapdragon);
+  parsers(snapdragon);
+  var ast = snapdragon.parse(pattern, options);
+  var res = snapdragon.compile(ast, options);
   return res;
 }
 
@@ -37,10 +42,10 @@ function posix(pattern, options) {
  * @api public
  */
 
-posix.match = function(arr, pattern, options) {
+brackets.match = function(arr, pattern, options) {
   arr = [].concat(arr);
-  var opts = utils.extend({}, options);
-  var isMatch = posix.matcher(pattern, opts);
+  var opts = extend({}, options);
+  var isMatch = brackets.matcher(pattern, opts);
   var len = arr.length;
   var idx = -1;
   var res = [];
@@ -82,8 +87,8 @@ posix.match = function(arr, pattern, options) {
  * @api public
  */
 
-posix.isMatch = function(str, pattern, options) {
-  return posix.matcher(pattern, options)(str);
+brackets.isMatch = function(str, pattern, options) {
+  return brackets.matcher(pattern, options)(str);
 };
 
 /**
@@ -105,8 +110,8 @@ posix.isMatch = function(str, pattern, options) {
  * @api public
  */
 
-posix.matcher = function(pattern, options) {
-  var re = posix.makeRe(pattern, options);
+brackets.matcher = function(pattern, options) {
+  var re = brackets.makeRe(pattern, options);
   return function(str) {
     return re.test(str);
   };
@@ -127,23 +132,22 @@ posix.matcher = function(pattern, options) {
  * @api public
  */
 
-posix.makeRe = function(pattern, options) {
-  var brackets = new Brackets(options);
-  return brackets.makeRe(pattern);
+brackets.makeRe = function(pattern, options) {
+  var res = brackets(pattern, options);
+  var opts = extend({strictErrors: false}, options);
+  return toRegex(res.output, opts);
 };
 
 /**
- * Expose `Poxis`
- * @type {Function}
+ * Expose `brackets` constructor, parsers and compilers
  */
 
-module.exports = posix;
+brackets.compilers = compilers;
+brackets.parsers = parsers;
 
 /**
- * Expose `Poxis` constructor
+ * Expose `brackets`
  * @type {Function}
  */
 
-module.exports.Brackets = Brackets;
-module.exports.compilers = compilers;
-module.exports.parsers = parsers;
+module.exports = brackets;
