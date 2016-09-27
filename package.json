@@ -30,11 +30,14 @@
     "debug": "^2.2.0",
     "define-property": "^0.2.5",
     "extend-shallow": "^2.0.1",
+    "posix-character-classes": "^0.1.0",
+    "regex-not": "^0.1.2",
     "snapdragon": "^0.7.0",
     "to-regex": "^0.1.1"
   },
   "devDependencies": {
     "gulp-format-md": "^0.1.10",
+    "helper-changelog": "^0.3.0",
     "minimatch": "^3.0.3",
     "mocha": "^3.0.2",
     "yargs-parser": "^4.0.0"
@@ -57,6 +60,9 @@
     "plugins": [
       "gulp-format-md"
     ],
+    "helpers": [
+      "helper-changelog"
+    ],
     "related": {
       "list": [
         "braces",
@@ -66,7 +72,9 @@
       ]
     },
     "reflinks": [
-      "verb"
+      "verb",
+      "micromatch",
+      "verb-generate-readme"
     ],
     "lint": {
       "reflinks": true

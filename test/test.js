@@ -33,7 +33,7 @@ describe('brackets', function() {
     assert.equal(brackets('[![:lower:]]').output, '[^a-z]');
     assert.equal(brackets('[[:digit:][:upper:][:space:]]').output, '[0-9A-Z \\t\\r\\n\\v\\f]+');
     assert.equal(brackets('[[:xdigit:]]').output, '[A-Fa-f0-9]');
-    assert.equal(brackets('[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]').output, '[a-zA-Z0-9a-zA-Z \\t\\x00-\\x1F\\x7F0-9\\x21-\\x7Ea-z\\x20-\\x7E\\-!"#$%&\'()\\*+,./:;<=>?@[\\]^_`{|}~ \\t\\r\\n\\v\\fA-ZA-Fa-f0-9]+');
+    assert.equal(brackets('[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]').output, '[a-zA-Z0-9a-zA-Z \\t\\x00-\\x1F\\x7F0-9\\x21-\\x7Ea-z\\x20-\\x7E \\-!"#$%&\'()\\*+,./:;<=>?@[\\]^_`{|}~ \\t\\r\\n\\v\\fA-ZA-Fa-f0-9]+');
     assert.equal(brackets('[^[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:lower:][:space:][:upper:][:xdigit:]]').output, '[^a-zA-Z0-9a-zA-Z \\t\\x00-\\x1F\\x7F0-9a-z \\t\\r\\n\\v\\fA-ZA-Fa-f0-9]+');
     assert.equal(brackets('[a-c[:digit:]x-z]').output, '[a-c0-9x-z]');
   });
