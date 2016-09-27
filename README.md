@@ -14,40 +14,170 @@ $ npm install --save expand-brackets
 
 ```js
 var brackets = require('expand-brackets');
+brackets(string[, options]);
 ```
 
-The main export is a function that returns a regex-compatible string:
+**Params**
+
+The main export is a function that takes the following parameters:
+
+* `pattern` **{String}**: the pattern to convert
+* `options` **{Object}**: optionally supply an options object
+* `returns` **{String}**: returns a string that can be used to create a regex
+
+**Example**
 
 ```js
-brackets('[![:lower:]]');
+console.log(brackets('[![:lower:]]'));
 //=> '[^a-z]'
 ```
 
-## .isMatch
+## API
 
-Returns true if the given string matches the bracket expression:
+### [brackets](index.js#L55)
+
+Parses the given POSIX character class `pattern` and returns an object with the compiled `output` and optional source `map`.
+
+**Params**
+
+* `pattern` **{String}**
+* `options` **{Object}**
+* `returns` **{Object}**
+
+**Example**
 
 ```js
-brackets.isMatch('A', '[![:lower:]]');
-//=> true
+var brackets = require('expand-brackets');
+console.log(brackets('[[:alpha:]]'));
+// { options: { source: 'string' },
+//   input: '[[:alpha:]]',
+//   state: {},
+//   compilers:
+//    { eos: [Function],
+//      noop: [Function],
+//      bos: [Function],
+//      not: [Function],
+//      escape: [Function],
+//      text: [Function],
+//      posix: [Function],
+//      bracket: [Function],
+//      'bracket.open': [Function],
+//      'bracket.inner': [Function],
+//      'bracket.literal': [Function],
+//      'bracket.close': [Function] },
+//   output: '[a-zA-Z]',
+//   ast:
+//    { type: 'root',
+//      errors: [],
+//      nodes: [ [Object], [Object], [Object] ] },
+//   parsingErrors: [] }
+```
 
-brackets.isMatch('a', '[![:lower:]]');
+### [.match](index.js#L85)
+
+Takes an array of strings and a POSIX character class pattern, and returns a new array with only the strings that matched the pattern.
+
+**Params**
+
+* `arr` **{Array}**: Array of strings to match
+* `pattern` **{String}**: POSIX character class pattern(s)
+* `options` **{Object}**
+* `returns` **{Array}**
+
+**Example**
+
+```js
+var brackets = require('expand-brackets');
+console.log(brackets.match(['1', 'a', 'ab'], '[[:alpha:]]'));
+//=> ['a']
+
+console.log(brackets.match(['1', 'a', 'ab'], '[[:alpha:]]+'));
+//=> ['a', 'ab']
+```
+
+### [.isMatch](index.js#L131)
+
+Returns true if the specified `string` matches the given brackets `pattern`.
+
+**Params**
+
+* `string` **{String}**: String to match
+* `pattern` **{String}**: Poxis pattern
+* `options` **{String}**
+* `returns` **{Boolean}**
+
+**Example**
+
+```js
+var brackets = require('expand-brackets');
+
+console.log(brackets.isMatch('a.a', '[[:alpha:]].[[:alpha:]]'));
+//=> true
+console.log(brackets.isMatch('1.2', '[[:alpha:]].[[:alpha:]]'));
 //=> false
 ```
 
-## .makeRe
+### [.matcher](index.js#L154)
 
-Make a regular expression from a bracket expression:
+Takes a POSIX character class pattern and returns a matcher function. The returned function takes the string to match as its only argument.
+
+**Params**
+
+* `pattern` **{String}**: Poxis pattern
+* `options` **{String}**
+* `returns` **{Boolean}**
+
+**Example**
 
 ```js
-brackets.makeRe('[![:lower:]]');
-//=> /[^a-z]/
+var brackets = require('expand-brackets');
+var isMatch = brackets.matcher('[[:lower:]].[[:upper:]]');
+
+console.log(isMatch('a.a'));
+//=> false
+console.log(isMatch('a.A'));
+//=> true
 ```
 
-## Matching
+### [.makeRe](index.js#L176)
 
-* [equivalence classes](https://www.gnu.org/software/gawk/manual/html_node/Bracket-Expressions.html) are not supported
-* [POSIX.2 collating symbols](https://www.gnu.org/software/gawk/manual/html_node/Bracket-Expressions.html) are not supported
+Create a regular expression from the given `pattern`.
+
+**Params**
+
+* `pattern` **{String}**: The pattern to convert to regex.
+* `options` **{Object}**
+* `returns` **{RegExp}**
+
+**Example**
+
+```js
+var brackets = require('expand-brackets');
+var re = brackets.makeRe('[[:alpha:]]');
+console.log(re);
+//=> /^(?:[a-zA-Z])$/
+```
+
+## Options
+
+### options.sourcemap
+
+Generate a source map for the given pattern.
+
+**Example**
+
+```js
+var res = brackets('[:alpha:]', {sourcemap: true});
+
+console.log(res.map);
+// { version: 3,
+//   sources: [ 'brackets' ],
+//   names: [],
+//   mappings: 'AAAA,MAAS',
+//   sourcesContent: [ '[:alpha:]' ] }
+```
+
+### POSIX Character classes
 
 The following named POSIX bracket expressions are supported:
 
@@ -60,6 +190,39 @@ The following named POSIX bracket expressions are supported:
 * `[:upper:]`: Uppercase letters (`[A-Z]`)
 * `[:word:]`: Word characters (letters, numbers and underscores) (`[A-Za-z0-9_]`)
 * `[:xdigit:]`: Hexadecimal digits (`[A-Fa-f0-9]`)
+
+See [posix-character-classes](https://github.com/jonschlinkert/posix-character-classes) for more details.
+
+**Not supported**
+
+* [equivalence classes](https://www.gnu.org/software/gawk/manual/html_node/Bracket-Expressions.html) are not supported
+* [POSIX.2 collating symbols](https://www.gnu.org/software/gawk/manual/html_node/Bracket-Expressions.html) are not supported
+
+## Changelog
+
+### v0.2.0
+
+In addition to performance and matching improvements, the v0.2.0 refactor adds complete POSIX character class support, with the exception of equivalence classes and POSIX.2 collating symbols which are not relevant to node.js usage.
+
+**Added features**
+
+* parser is exposed, so that expand-brackets parsers can be used by upstream parsers (like [micromatch](https://github.com/jonschlinkert/micromatch))
+* compiler is exposed, so that expand-brackets compilers can be used by upstream compilers
+* source maps
+
+**source map example**
+
+```js
+var brackets = require('expand-brackets');
+var res = brackets('[:alpha:]');
+console.log(res.map);
+
+{ version: 3,
+     sources: [ 'brackets' ],
+     names: [],
+     mappings: 'AAAA,MAAS',
+     sourcesContent: [ '[:alpha:]' ] }
+```
 
 ## About
 
