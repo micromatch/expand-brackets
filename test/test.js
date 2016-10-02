@@ -11,7 +11,7 @@ var isMatch = argv.mm ? minimatch : brackets.isMatch.bind(matcher);
 
 function match(arr, pattern, expected, options) {
   var actual = matcher.match(arr, pattern, options);
-  assert.deepEqual(actual.sort(), expected.sort());
+  assert.deepEqual(actual.sort(), expected.sort(), pattern);
 }
 
 describe('brackets', function() {

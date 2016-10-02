@@ -58,6 +58,7 @@ function brackets(pattern, options) {
   compilers(snapdragon);
   parsers(snapdragon);
   var ast = snapdragon.parse(pattern, options);
+  ast.input = pattern;
   var res = snapdragon.compile(ast, options);
   res.input = pattern;
   return res;
