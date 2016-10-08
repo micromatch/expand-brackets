@@ -31,9 +31,9 @@
     "define-property": "^0.2.5",
     "extend-shallow": "^2.0.1",
     "posix-character-classes": "^0.1.0",
-    "regex-not": "^0.1.2",
+    "regex-not": "^1.0.0",
     "snapdragon": "^0.7.0",
-    "to-regex": "^0.1.1"
+    "to-regex": "^2.1.0"
   },
   "devDependencies": {
     "gulp-format-md": "^0.1.10",
