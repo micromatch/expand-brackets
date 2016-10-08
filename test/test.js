@@ -26,16 +26,16 @@ describe('brackets', function() {
   });
 
   it('should create the equivalent regex character classes for POSIX expressions:', function() {
-    assert.equal(brackets('foo[[:lower:]]bar').output, 'foo[a-z]bar');
-    assert.equal(brackets('foo[[:lower:][:upper:]]bar').output, 'foo[a-zA-Z]bar');
-    assert.equal(brackets('[[:alpha:]123]').output, '[a-zA-Z123]');
-    assert.equal(brackets('[[:lower:]]').output, '[a-z]');
-    assert.equal(brackets('[![:lower:]]').output, '[^a-z]');
-    assert.equal(brackets('[[:digit:][:upper:][:space:]]').output, '[0-9A-Z \\t\\r\\n\\v\\f]+');
-    assert.equal(brackets('[[:xdigit:]]').output, '[A-Fa-f0-9]');
-    assert.equal(brackets('[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]').output, '[a-zA-Z0-9a-zA-Z \\t\\x00-\\x1F\\x7F0-9\\x21-\\x7Ea-z\\x20-\\x7E \\-!"#$%&\'()\\*+,./:;<=>?@[\\]^_`{|}~ \\t\\r\\n\\v\\fA-ZA-Fa-f0-9]+');
-    assert.equal(brackets('[^[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:lower:][:space:][:upper:][:xdigit:]]').output, '[^a-zA-Z0-9a-zA-Z \\t\\x00-\\x1F\\x7F0-9a-z \\t\\r\\n\\v\\fA-ZA-Fa-f0-9]+');
-    assert.equal(brackets('[a-c[:digit:]x-z]').output, '[a-c0-9x-z]');
+    assert.equal(brackets('foo[[:lower:]]bar'), 'foo[a-z]bar');
+    assert.equal(brackets('foo[[:lower:][:upper:]]bar'), 'foo[a-zA-Z]bar');
+    assert.equal(brackets('[[:alpha:]123]'), '[a-zA-Z123]');
+    assert.equal(brackets('[[:lower:]]'), '[a-z]');
+    assert.equal(brackets('[![:lower:]]'), '[^a-z]');
+    assert.equal(brackets('[[:digit:][:upper:][:space:]]'), '[0-9A-Z \\t\\r\\n\\v\\f]+');
+    assert.equal(brackets('[[:xdigit:]]'), '[A-Fa-f0-9]');
+    assert.equal(brackets('[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]'), '[a-zA-Z0-9a-zA-Z \\t\\x00-\\x1F\\x7F0-9\\x21-\\x7Ea-z\\x20-\\x7E \\-!"#$%&\'()\\*+,./:;<=>?@[\\]^_`{|}~ \\t\\r\\n\\v\\fA-ZA-Fa-f0-9]+');
+    assert.equal(brackets('[^[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:lower:][:space:][:upper:][:xdigit:]]'), '[^a-zA-Z0-9a-zA-Z \\t\\x00-\\x1F\\x7F0-9a-z \\t\\r\\n\\v\\fA-ZA-Fa-f0-9]+');
+    assert.equal(brackets('[a-c[:digit:]x-z]'), '[a-c0-9x-z]');
   });
 
   it('should support regex character classes:', function() {
@@ -57,8 +57,8 @@ describe('brackets', function() {
   });
 
   it('should not create an invalid posix character class:', function() {
-    assert.equal(matcher('[:al:]').output, '[al]');
-    assert.equal(matcher('[abc[:punct:][0-9]').output, '[abc\\-!"#$%&\'()\\*+,./:;<=>?@[\\]^_`{|}~[0-9]');
+    assert.equal(matcher('[:al:]'), '[al]');
+    assert.equal(matcher('[abc[:punct:][0-9]'), '[abc\\-!"#$%&\'()\\*+,./:;<=>?@[\\]^_`{|}~[0-9]');
   });
 
   it('should return `true` when the pattern matches:', function() {
@@ -221,7 +221,7 @@ describe('POSIX: From the test suite for the POSIX.2 (BRE) pattern matching code
     assert(isMatch('9', '[[:digit:]]'));
     assert(!isMatch('X', '[[:digit:]]'));
     assert(isMatch('aB', '[[:lower:]][[:upper:]]'));
-    assert.equal(brackets('[_[:alpha:]][_[:alnum:]][_[:alnum:]]*').output, '[_a-zA-Z][_a-zA-Z0-9][_a-zA-Z0-9]*');
+    assert.equal(brackets('[_[:alpha:]][_[:alnum:]][_[:alnum:]]*'), '[_a-zA-Z][_a-zA-Z0-9][_a-zA-Z0-9]*');
     assert(isMatch('a3', '[[:alpha:][:digit:]]'));
     assert(!isMatch('a', '[[:alpha:]\\]'));
   });
