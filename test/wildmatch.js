@@ -35,24 +35,40 @@ describe('original wildmatch', function() {
     assert(isMatch('foo-bar', 'f[^eiu][^eiu][^eiu][^eiu][^eiu]r'));
   });
 
-  it('should support Various additional tests', function() {
-    assert(!isMatch('acrt', 'a[c-c]st'));
-    assert(isMatch('acrt', 'a[c-c]rt'));
-    assert(!isMatch(']', '[!]-]'));
-    assert(isMatch('a', '[!]-]'));
+  it('should match braces', function() {
+    assert(isMatch('foo{}baz', 'foo[{a,b}]+baz'));
+  });
+
+  it('should match parens', function() {
+    assert(isMatch('foo(bar)baz', 'foo[bar()]+baz'));
+  });
+
+  it('should match escaped characters', function() {
     assert(!isMatch('', '\\'));
     assert(!isMatch('\\', '\\'));
     assert(!isMatch('XXX/\\', '[A-Z]+/\\'));
     assert(isMatch('XXX/\\', '[A-Z]+/\\\\'));
-    assert(isMatch('foo', 'foo'));
-    assert(isMatch('@foo', '@foo'));
-    assert(!isMatch('foo', '@foo'));
     assert(isMatch('[ab]', '\\[ab]'));
+    assert(isMatch('[ab]', '[\\[:]ab]'));
+  });
+
+  it('should match brackets', function() {
+    assert(!isMatch(']', '[!]-]'));
+    assert(isMatch('a', '[!]-]'));
     assert(isMatch('[ab]', '[[]ab]'));
+  });
+
+  it('should not choke on malformed posix brackets', function() {
     assert(isMatch('[ab]', '[[:]ab]'));
     assert(!isMatch('[ab]', '[[::]ab]'));
     assert(isMatch('[ab]', '[[:digit]ab]'));
-    assert(isMatch('[ab]', '[\\[:]ab]'));
+  });
+
+  it('should not choke on non-bracket characters', function() {
+    assert(isMatch('@foo', '@foo'));
+    assert(!isMatch('foo', '@foo'));
+    assert(isMatch('{foo}', '{foo}'));
+    assert(isMatch('({foo})', '({foo})'));
   });
 
   it('should support Character class tests', function() {
@@ -77,6 +93,8 @@ describe('original wildmatch', function() {
   });
 
   it('should support Additional tests, including some malformed wildmats', function() {
+    assert(!isMatch('acrt', 'a[c-c]st'));
+    assert(isMatch('acrt', 'a[c-c]rt'));
     assert(isMatch(']', '[\\\\-^]'));
     assert(!isMatch('[', '[\\\\-^]'));
     assert(isMatch('-', '[\\-_]'));
