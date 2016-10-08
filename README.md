@@ -34,15 +34,105 @@ console.log(brackets('[![:lower:]]'));
 
 ## API
 
-### [brackets](index.js#L55)
+### [brackets](index.js#L29)
 
-Parses the given POSIX character class `pattern` and returns an object with the compiled `output` and optional source `map`.
+Parses the given POSIX character class `pattern` and returns a
+string that can be used for creating regular expressions for matching.
 
 **Params**
 
 * `pattern` **{String}**
 * `options` **{Object}**
 * `returns` **{Object}**
+
+### [.match](index.js#L54)
+
+Takes an array of strings and a POSIX character class pattern, and returns a new array with only the strings that matched the pattern.
+
+**Example**
+
+```js
+var brackets = require('expand-brackets');
+console.log(brackets.match(['1', 'a', 'ab'], '[[:alpha:]]'));
+//=> ['a']
+
+console.log(brackets.match(['1', 'a', 'ab'], '[[:alpha:]]+'));
+//=> ['a', 'ab']
+```
+
+**Params**
+
+* `arr` **{Array}**: Array of strings to match
+* `pattern` **{String}**: POSIX character class pattern(s)
+* `options` **{Object}**
+* `returns` **{Array}**
+
+### [.isMatch](index.js#L100)
+
+Returns true if the specified `string` matches the given brackets `pattern`.
+
+**Example**
+
+```js
+var brackets = require('expand-brackets');
+
+console.log(brackets.isMatch('a.a', '[[:alpha:]].[[:alpha:]]'));
+//=> true
+console.log(brackets.isMatch('1.2', '[[:alpha:]].[[:alpha:]]'));
+//=> false
+```
+
+**Params**
+
+* `string` **{String}**: String to match
+* `pattern` **{String}**: Poxis pattern
+* `options` **{String}**
+* `returns` **{Boolean}**
+
+### [.matcher](index.js#L123)
+
+Takes a POSIX character class pattern and returns a matcher function. The returned function takes the string to match as its only argument.
+
+**Example**
+
+```js
+var brackets = require('expand-brackets');
+var isMatch = brackets.matcher('[[:lower:]].[[:upper:]]');
+
+console.log(isMatch('a.a'));
+//=> false
+console.log(isMatch('a.A'));
+//=> true
+```
+
+**Params**
+
+* `pattern` **{String}**: Poxis pattern
+* `options` **{String}**
+* `returns` **{Boolean}**
+
+### [.makeRe](index.js#L145)
+
+Create a regular expression from the given `pattern`.
+
+**Example**
+
+```js
+var brackets = require('expand-brackets');
+var re = brackets.makeRe('[[:alpha:]]');
+console.log(re);
+//=> /^(?:[a-zA-Z])$/
+```
+
+**Params**
+
+* `pattern` **{String}**: The pattern to convert to regex.
+* `options` **{Object}**
+* `returns` **{RegExp}**
+
+### [.create](index.js#L187)
+
+Parses the given POSIX character class `pattern` and returns an object with the compiled `output` and optional source `map`.
 
 **Example**
 
@@ -73,90 +163,11 @@ console.log(brackets('[[:alpha:]]'));
 //   parsingErrors: [] }
 ```
 
-### [.match](index.js#L85)
-
-Takes an array of strings and a POSIX character class pattern, and returns a new array with only the strings that matched the pattern.
-
 **Params**
 
-* `arr` **{Array}**: Array of strings to match
-* `pattern` **{String}**: POSIX character class pattern(s)
+* `pattern` **{String}**
 * `options` **{Object}**
-* `returns` **{Array}**
-
-**Example**
-
-```js
-var brackets = require('expand-brackets');
-console.log(brackets.match(['1', 'a', 'ab'], '[[:alpha:]]'));
-//=> ['a']
-
-console.log(brackets.match(['1', 'a', 'ab'], '[[:alpha:]]+'));
-//=> ['a', 'ab']
-```
-
-### [.isMatch](index.js#L131)
-
-Returns true if the specified `string` matches the given brackets `pattern`.
-
-**Params**
-
-* `string` **{String}**: String to match
-* `pattern` **{String}**: Poxis pattern
-* `options` **{String}**
-* `returns` **{Boolean}**
-
-**Example**
-
-```js
-var brackets = require('expand-brackets');
-
-console.log(brackets.isMatch('a.a', '[[:alpha:]].[[:alpha:]]'));
-//=> true
-console.log(brackets.isMatch('1.2', '[[:alpha:]].[[:alpha:]]'));
-//=> false
-```
-
-### [.matcher](index.js#L154)
-
-Takes a POSIX character class pattern and returns a matcher function. The returned function takes the string to match as its only argument.
-
-**Params**
-
-* `pattern` **{String}**: Poxis pattern
-* `options` **{String}**
-* `returns` **{Boolean}**
-
-**Example**
-
-```js
-var brackets = require('expand-brackets');
-var isMatch = brackets.matcher('[[:lower:]].[[:upper:]]');
-
-console.log(isMatch('a.a'));
-//=> false
-console.log(isMatch('a.A'));
-//=> true
-```
-
-### [.makeRe](index.js#L176)
-
-Create a regular expression from the given `pattern`.
-
-**Params**
-
-* `pattern` **{String}**: The pattern to convert to regex.
-* `options` **{Object}**
-* `returns` **{RegExp}**
-
-**Example**
-
-```js
-var brackets = require('expand-brackets');
-var re = brackets.makeRe('[[:alpha:]]');
-console.log(re);
-//=> /^(?:[a-zA-Z])$/
-```
+* `returns` **{Object}**
 
 ## Options
 
@@ -200,6 +211,16 @@ See [posix-character-classes](https://github.com/jonschlinkert/posix-character-c
 
 ## Changelog
 
+### v2.0.0
+
+**Breaking changes**
+
+* The main export now returns the compiled string, instead of the object returned from the compiler
+
+**Added features**
+
+* Adds a `.create` method to do what the main function did before v0.3.0
+
 ### v0.2.0
 
 In addition to performance and matching improvements, the v0.2.0 refactor adds complete POSIX character class support, with the exception of equivalence classes and POSIX.2 collating symbols which are not relevant to node.js usage.
@@ -241,7 +262,7 @@ Pull requests and stars are always welcome. For bugs and feature requests, [plea
 
 | **Commits** | **Contributor**<br/> | 
 | --- | --- |
-| 17 | [jonschlinkert](https://github.com/jonschlinkert) |
+| 35 | [jonschlinkert](https://github.com/jonschlinkert) |
 | 2 | [MartinKolarik](https://github.com/MartinKolarik) |
 | 2 | [es128](https://github.com/es128) |
 | 1 | [eush77](https://github.com/eush77) |
@@ -278,4 +299,4 @@ Released under the [MIT license](https://github.com/jonschlinkert/expand-bracket
 
 ***
 
-_This file was generated by [verb-generate-readme](https://github.com/verbose/verb-generate-readme), v0.1.31, on September 27, 2016._
+_This file was generated by [verb-generate-readme](https://github.com/verbose/verb-generate-readme), v0.1.31, on October 08, 2016._
