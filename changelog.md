@@ -8,7 +8,7 @@
 
 **Added features**
 
-- Adds a `.create` method to do what the main function did before v0.3.0
+- Adds a `.create` method to do what the main function did before v2.0.0
 
 ### v0.2.0
 

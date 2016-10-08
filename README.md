@@ -219,7 +219,7 @@ See [posix-character-classes](https://github.com/jonschlinkert/posix-character-c
 
 **Added features**
 
-* Adds a `.create` method to do what the main function did before v0.3.0
+* Adds a `.create` method to do what the main function did before v2.0.0
 
 ### v0.2.0
 
@@ -262,7 +262,7 @@ Pull requests and stars are always welcome. For bugs and feature requests, [plea
 
 | **Commits** | **Contributor**<br/> | 
 | --- | --- |
-| 35 | [jonschlinkert](https://github.com/jonschlinkert) |
+| 42 | [jonschlinkert](https://github.com/jonschlinkert) |
 | 2 | [MartinKolarik](https://github.com/MartinKolarik) |
 | 2 | [es128](https://github.com/es128) |
 | 1 | [eush77](https://github.com/eush77) |
