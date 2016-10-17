@@ -1,10 +1,10 @@
 'use strict';
 
 var argv = require('yargs-parser')(process.argv.slice(2));
-var mm = require('multimatch');
 var minimatch = require('minimatch');
+var mm = require('multimatch');
+var bash = require('bash-match');
 var utils = require('../../lib/utils');
-var bash = require('./bash');
 var brackets = require('../..');
 
 // use multimatch for the array/array scenario

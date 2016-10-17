@@ -36,8 +36,7 @@
     "to-regex": "^3.0.1"
   },
   "devDependencies": {
-    "cross-spawn": "^4.0.2",
-    "fs-exists-sync": "^0.1.0",
+    "bash-match": "^0.1.1",
     "gulp-format-md": "^0.1.10",
     "helper-changelog": "^0.3.0",
     "minimatch": "^3.0.3",
