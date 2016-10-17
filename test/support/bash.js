@@ -1,40 +1,27 @@
 'use strict';
 
 var spawn = require('cross-spawn');
-var bashPath = process.env.BASH || '/usr/local/bin/bash';
+var utils = require('./utils');
 
-function bash(pattern) {
-  try {
-    var cmd = pattern;
-    if (!/echo/.test(cmd)) {
-      cmd = `shopt -s extglob && echo ${pattern}`;
-    }
-    var res = spawn.sync(bashPath, ['-c', cmd]);
-    var err = toString(res.stderr);
-    if (err) {
-      console.error(cmd);
-      throw new Error(err);
-    }
-    return toString(res.stdout);
-  } catch (err) {
-    console.log(err);
+function bash(str, pattern, options) {
+  var cmd = pattern;
+
+  if (!/echo/.test(cmd)) {
+    cmd = `shopt -s extglob && if [[ ${str} == ${pattern} ]]; then echo true; fi`;
   }
+
+  var res = spawn.sync(utils.getBashPath(), ['-c', cmd], options);
+  var err = toString(res.stderr);
+  if (err) {
+    console.error(cmd);
+    throw new Error(err);
+  }
+
+  return !!toString(res.stdout);
 }
 
-bash.isMatch = function(fixture, pattern) {
-  var cmd = [
-    'while read res str pat; do',
-    '  [[ $str = ${pat} ]]',
-    '  ts=$?',
-    '  if [[ ( $ts -gt 0 && $res = t) || ($ts -eq 0 && $res = f) ]]; then',
-    '    echo false',
-    '  fi',
-    'done <<EOT',
-    '',
-    `t ${fixture} ${pattern}`,
-    'EOT',
-  ].join('\n');
-  return bash(cmd) === '';
+bash.isMatch = function(fixture, pattern, options) {
+  return bash(fixture, pattern, options);
 };
 
 bash.match = function(fixtures, pattern) {
@@ -47,7 +34,7 @@ bash.match = function(fixtures, pattern) {
       matches.push(fixture);
     }
   }
-  return matches.sort(alphaSort);
+  return matches;
 };
 
 /**
@@ -56,16 +43,6 @@ bash.match = function(fixtures, pattern) {
 
 function toString(buf) {
   return buf ? buf.toString().trim() : null;
-}
-
-/**
- * Sort
- */
-
-function alphaSort(a, b) {
-  a = String(a).toLowerCase();
-  b = String(b).toLowerCase();
-  return a > b ? 1 : a < b ? -1 : 0;
 }
 
 /**
