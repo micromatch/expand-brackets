@@ -1,7 +1,7 @@
 {
   "name": "expand-brackets",
   "description": "Expand POSIX bracket expressions (character classes) in glob patterns.",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "homepage": "https://github.com/jonschlinkert/expand-brackets",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "contributors": [
