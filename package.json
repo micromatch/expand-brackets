@@ -32,15 +32,17 @@
     "extend-shallow": "^2.0.1",
     "posix-character-classes": "^0.1.0",
     "regex-not": "^1.0.0",
-    "snapdragon": "^0.7.0",
-    "to-regex": "^2.1.0"
+    "snapdragon": "^0.8.1",
+    "to-regex": "^3.0.1"
   },
   "devDependencies": {
     "cross-spawn": "^4.0.2",
+    "fs-exists-sync": "^0.1.0",
     "gulp-format-md": "^0.1.10",
     "helper-changelog": "^0.3.0",
     "minimatch": "^3.0.3",
     "mocha": "^3.0.2",
+    "multimatch": "^2.1.0",
     "yargs-parser": "^4.0.0"
   },
   "keywords": [
