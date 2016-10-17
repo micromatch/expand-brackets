@@ -185,9 +185,10 @@ brackets.makeRe = function(pattern, options) {
  */
 
 brackets.create = function(pattern, options) {
-  var snapdragon = new Snapdragon(options);
+  var snapdragon = (options && options.snapdragon) || new Snapdragon(options);
   compilers(snapdragon);
   parsers(snapdragon);
+
   var ast = snapdragon.parse(pattern, options);
   ast.input = pattern;
   var res = snapdragon.compile(ast, options);
