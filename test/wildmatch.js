@@ -2,185 +2,175 @@
 
 require('mocha');
 var assert = require('assert');
-var argv = require('yargs-parser')(process.argv.slice(2));
-var mm = require('minimatch');
-var brackets = require('..');
-
-var matcher = argv.mm ? mm : brackets;
-var isMatch = argv.mm ? mm : brackets.isMatch.bind(matcher);
-
-function match(arr, pattern, expected, options) {
-  var actual = matcher.match(arr, pattern, options);
-  assert.deepEqual(actual.sort(), expected.sort());
-}
+var match = require('./support/match');
 
 describe('original wildmatch', function() {
   it('should support basic wildmatch (brackets) features', function() {
-    assert(!isMatch('ten', '[ten]'));
-    assert(isMatch('ten', 't[a-g]n'));
-    assert(!isMatch('ten', 't[!a-g]n'));
-    assert(isMatch('ton', 't[!a-g]n'));
-    assert(isMatch('ton', 't[^a-g]n'));
-    assert(isMatch('a]b', 'a[]]b'));
-    assert(isMatch('a-b', 'a[]-]b'));
-    assert(isMatch('a]b', 'a[]-]b'));
-    assert(!isMatch('aab', 'a[]-]b'));
-    assert(isMatch('aab', 'a[]a-]b'));
-    assert(isMatch(']', ']'));
+    assert(!match.isMatch('aab', 'a[]-]b'));
+    assert(!match.isMatch('ten', '[ten]'));
+    assert(!match.isMatch('ten', 't[!a-g]n'));
+    assert(match.isMatch(']', ']'));
+    assert(match.isMatch('a-b', 'a[]-]b'));
+    assert(match.isMatch('a]b', 'a[]-]b'));
+    assert(match.isMatch('a]b', 'a[]]b'));
+    assert(match.isMatch('aab', 'a[]a-]b'));
+    assert(match.isMatch('ten', 't[a-g]n'));
+    assert(match.isMatch('ton', 't[!a-g]n'));
+    assert(match.isMatch('ton', 't[^a-g]n'));
   });
 
   it('should support Extended slash-matching features', function() {
-    assert(isMatch('foo/bar', 'foo[/]bar'));
-    assert(!isMatch('foo/bar', 'f[^eiu][^eiu][^eiu][^eiu][^eiu]r'));
-    assert(isMatch('foo-bar', 'f[^eiu][^eiu][^eiu][^eiu][^eiu]r'));
+    assert(!match.isMatch('foo/bar', 'f[^eiu][^eiu][^eiu][^eiu][^eiu]r'));
+    assert(match.isMatch('foo/bar', 'foo[/]bar'));
+    assert(match.isMatch('foo-bar', 'f[^eiu][^eiu][^eiu][^eiu][^eiu]r'));
   });
 
   it('should match braces', function() {
-    assert(isMatch('foo{}baz', 'foo[{a,b}]+baz'));
+    assert(match.isMatch('foo{}baz', 'foo[{a,b}]+baz'));
   });
 
   it('should match parens', function() {
-    assert(isMatch('foo(bar)baz', 'foo[bar()]+baz'));
+    assert(match.isMatch('foo(bar)baz', 'foo[bar()]+baz'));
   });
 
   it('should match escaped characters', function() {
-    assert(!isMatch('', '\\'));
-    assert(!isMatch('\\', '\\'));
-    assert(!isMatch('XXX/\\', '[A-Z]+/\\'));
-    assert(isMatch('XXX/\\', '[A-Z]+/\\\\'));
-    assert(isMatch('[ab]', '\\[ab]'));
-    assert(isMatch('[ab]', '[\\[:]ab]'));
+    assert(!match.isMatch('', '\\'));
+    assert(!match.isMatch('XXX/\\', '[A-Z]+/\\'));
+    assert(match.isMatch('\\', '\\'));
+    assert(match.isMatch('XXX/\\', '[A-Z]+/\\\\'));
+    assert(match.isMatch('[ab]', '\\[ab]'));
+    assert(match.isMatch('[ab]', '[\\[:]ab]'));
   });
 
   it('should match brackets', function() {
-    assert(!isMatch(']', '[!]-]'));
-    assert(isMatch('a', '[!]-]'));
-    assert(isMatch('[ab]', '[[]ab]'));
+    assert(!match.isMatch(']', '[!]-]'));
+    assert(match.isMatch('a', '[!]-]'));
+    assert(match.isMatch('[ab]', '[[]ab]'));
   });
 
   it('should not choke on malformed posix brackets', function() {
-    assert(isMatch('[ab]', '[[:]ab]'));
-    assert(!isMatch('[ab]', '[[::]ab]'));
-    assert(isMatch('[ab]', '[[:digit]ab]'));
+    assert(!match.isMatch('[ab]', '[[::]ab]'));
+    assert(match.isMatch('[ab]', '[[:]ab]'));
+    assert(match.isMatch('[ab]', '[[:digit]ab]'));
   });
 
   it('should not choke on non-bracket characters', function() {
-    assert(isMatch('@foo', '@foo'));
-    assert(!isMatch('foo', '@foo'));
-    assert(isMatch('{foo}', '{foo}'));
-    assert(isMatch('({foo})', '({foo})'));
+    assert(!match.isMatch('foo', '@foo'));
+    assert(match.isMatch('({foo})', '({foo})'));
+    assert(match.isMatch('@foo', '@foo'));
+    assert(match.isMatch('{foo}', '{foo}'));
   });
 
   it('should support Character class tests', function() {
-    assert(isMatch('a1B', '[[:alpha:]][[:digit:]][[:upper:]]'));
-    assert(!isMatch('a', '[[:digit:][:upper:][:space:]]'));
-    assert(isMatch('A', '[[:digit:][:upper:][:space:]]'));
-    assert(isMatch('1', '[[:digit:][:upper:][:space:]]'));
-    assert(!isMatch('1', '[[:digit:][:upper:][:spaci:]]'));
-    assert(isMatch(' ', '[[:digit:][:upper:][:space:]]'));
-    assert(!isMatch('.', '[[:digit:][:upper:][:space:]]'));
-    assert(isMatch('.', '[[:digit:][:punct:][:space:]]'));
-    assert(isMatch('5', '[[:xdigit:]]'));
-    assert(isMatch('f', '[[:xdigit:]]'));
-    assert(isMatch('D', '[[:xdigit:]]'));
-    assert(isMatch('_', '[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]'));
-    assert(isMatch('_', '[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]'));
-    assert(isMatch('.', '[^[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:lower:][:space:][:upper:][:xdigit:]]'));
-    assert(isMatch('5', '[a-c[:digit:]x-z]'));
-    assert(isMatch('b', '[a-c[:digit:]x-z]'));
-    assert(isMatch('y', '[a-c[:digit:]x-z]'));
-    assert(!isMatch('q', '[a-c[:digit:]x-z]'));
+    assert(!match.isMatch('.', '[[:digit:][:upper:][:space:]]'));
+    assert(!match.isMatch('1', '[[:digit:][:upper:][:spaci:]]'));
+    assert(!match.isMatch('a', '[[:digit:][:upper:][:space:]]'));
+    assert(!match.isMatch('q', '[a-c[:digit:]x-z]'));
+    assert(match.isMatch(' ', '[[:digit:][:upper:][:space:]]'));
+    assert(match.isMatch('.', '[[:digit:][:punct:][:space:]]'));
+    assert(match.isMatch('.', '[^[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:lower:][:space:][:upper:][:xdigit:]]'));
+    assert(match.isMatch('1', '[[:digit:][:upper:][:space:]]'));
+    assert(match.isMatch('5', '[[:xdigit:]]'));
+    assert(match.isMatch('5', '[a-c[:digit:]x-z]'));
+    assert(match.isMatch('_', '[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]'));
+    assert(match.isMatch('_', '[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]'));
+    assert(match.isMatch('A', '[[:digit:][:upper:][:space:]]'));
+    assert(match.isMatch('a1B', '[[:alpha:]][[:digit:]][[:upper:]]'));
+    assert(match.isMatch('b', '[a-c[:digit:]x-z]'));
+    assert(match.isMatch('D', '[[:xdigit:]]'));
+    assert(match.isMatch('f', '[[:xdigit:]]'));
+    assert(match.isMatch('y', '[a-c[:digit:]x-z]'));
   });
 
   it('should support Additional tests, including some malformed wildmats', function() {
-    assert(!isMatch('acrt', 'a[c-c]st'));
-    assert(isMatch('acrt', 'a[c-c]rt'));
-    assert(isMatch(']', '[\\\\-^]'));
-    assert(!isMatch('[', '[\\\\-^]'));
-    assert(isMatch('-', '[\\-_]'));
-    assert(isMatch(']', '[\\]]'));
-    assert(!isMatch('\\]', '[\\]]'));
-    assert(!isMatch('\\', '[\\]]'));
-    assert(!isMatch('ab', 'a[]b'));
-    assert(!isMatch('a[]b', 'a[]b'));
-    assert(!isMatch('ab[', 'ab['));
-    assert(!isMatch('ab', '[!'));
-    assert(!isMatch('ab', '[-'));
-    assert(isMatch('-', '[-]'));
-    assert(!isMatch('-', '[a-'));
-    assert(!isMatch('-', '[!a-'));
-    assert(isMatch('-', '[--A]'));
-    assert(isMatch('5', '[--A]'));
-    assert(isMatch(' ', '[ --]'));
-    assert(isMatch('$', '[ --]'));
-    assert(isMatch('-', '[ --]'));
-    assert(!isMatch('0', '[ --]'));
-    assert(isMatch('-', '[---]'));
-    assert(isMatch('-', '[------]'));
-    assert(!isMatch('j', '[a-e-n]'));
-    assert(isMatch('-', '[a-e-n]'));
-    assert(isMatch('a', '[!------]'));
-    assert(!isMatch('[', '[]-a]'));
-    assert(isMatch('^', '[]-a]'));
-    assert(!isMatch('^', '[!]-a]'));
-    assert(isMatch('[', '[!]-a]'));
-    assert(isMatch('^', '[a^bc]'));
-    assert(isMatch('-b]', '[a-]b]'));
-    assert(!isMatch('\\', '[\\]'));
-    assert(isMatch('\\', '[\\\\]'));
-    assert(!isMatch('\\', '[!\\\\]'));
-    assert(isMatch('G', '[A-\\\\]'));
-    assert(isMatch(',', '[,]'));
-    assert(isMatch(',', '[\\\\,]'));
-    assert(isMatch('\\', '[\\\\,]'));
-    assert(isMatch('-', '[,-.]'));
-    assert(!isMatch('+', '[,-.]'));
-    assert(!isMatch('-.]', '[,-.]'));
-    assert(isMatch('2', '[\\1-\\3]'));
-    assert(isMatch('3', '[\\1-\\3]'));
-    assert(!isMatch('4', '[\\1-\\3]'));
-    assert(isMatch('\\', '[[-\\]]'));
-    assert(isMatch('[', '[[-\\]]'));
-    assert(isMatch(']', '[[-\\]]'));
-    assert(!isMatch('-', '[[-\\]]'));
+    assert(!match.isMatch('+', '[,-.]'));
+    assert(!match.isMatch('-', '[!a-'));
+    assert(!match.isMatch('-', '[[-\\]]'));
+    assert(!match.isMatch('-', '[a-'));
+    assert(!match.isMatch('-.]', '[,-.]'));
+    assert(!match.isMatch('0', '[ --]'));
+    assert(!match.isMatch('4', '[\\1-\\3]'));
+    assert(!match.isMatch('[', '[\\\\-^]'));
+    assert(!match.isMatch('[', '[]-a]'));
+    assert(!match.isMatch('\\', '[!\\\\]'));
+    assert(!match.isMatch('\\', '[\\]'));
+    assert(!match.isMatch('\\', '[\\]]'));
+    assert(!match.isMatch('\\]', '[\\]]'));
+    assert(!match.isMatch('^', '[!]-a]'));
+    assert(!match.isMatch('a[]b', 'a[]b'));
+    assert(!match.isMatch('ab', '[!'));
+    assert(!match.isMatch('ab', '[-'));
+    assert(!match.isMatch('ab', 'a[]b'));
+    assert(!match.isMatch('acrt', 'a[c-c]st'));
+    assert(!match.isMatch('j', '[a-e-n]'));
+    assert(match.isMatch(' ', '[ --]'));
+    assert(match.isMatch('$', '[ --]'));
+    assert(match.isMatch(',', '[,]'));
+    assert(match.isMatch(',', '[\\\\,]'));
+    assert(match.isMatch('-', '[ --]'));
+    assert(match.isMatch('-', '[,-.]'));
+    assert(match.isMatch('-', '[------]'));
+    assert(match.isMatch('-', '[---]'));
+    assert(match.isMatch('-', '[--A]'));
+    assert(match.isMatch('-', '[-]'));
+    assert(match.isMatch('-', '[\\-_]'));
+    assert(match.isMatch('-', '[a-e-n]'));
+    assert(match.isMatch('-b]', '[a-]b]'));
+    assert(match.isMatch('2', '[\\1-\\3]'));
+    assert(match.isMatch('3', '[\\1-\\3]'));
+    assert(match.isMatch('5', '[--A]'));
+    assert(match.isMatch('[', '[!]-a]'));
+    assert(match.isMatch('[', '[[-\\]]'));
+    assert(match.isMatch('\\', '[[-\\]]'));
+    assert(match.isMatch('\\', '[\\\\,]'));
+    assert(match.isMatch('\\', '[\\\\]'));
+    assert(match.isMatch(']', '[[-\\]]'));
+    assert(match.isMatch(']', '[\\\\-^]'));
+    assert(match.isMatch(']', '[\\]]'));
+    assert(match.isMatch('^', '[]-a]'));
+    assert(match.isMatch('^', '[a^bc]'));
+    assert(match.isMatch('a', '[!------]'));
+    assert(match.isMatch('ab[', 'ab['));
+    assert(match.isMatch('acrt', 'a[c-c]rt'));
+    assert(match.isMatch('G', '[A-\\\\]'));
   });
 
   it('should support Case-sensitivy features', function() {
-    assert(!isMatch('a', '[A-Z]'));
-    assert(isMatch('A', '[A-Z]'));
-    assert(!isMatch('A', '[a-z]'));
-    assert(isMatch('a', '[a-z]'));
-    assert(!isMatch('a', '[[:upper:]]'));
-    assert(isMatch('A', '[[:upper:]]'));
-    assert(!isMatch('A', '[[:lower:]]'));
-    assert(isMatch('a', '[[:lower:]]'));
-    assert(!isMatch('A', '[B-Za]'));
-    assert(isMatch('a', '[B-Za]'));
-    assert(!isMatch('A', '[B-a]'));
-    assert(isMatch('a', '[B-a]'));
-    assert(!isMatch('z', '[Z-y]'));
-    assert(isMatch('Z', '[Z-y]'));
+    assert(!match.isMatch('A', '[[:lower:]]'));
+    assert(!match.isMatch('a', '[[:upper:]]'));
+    assert(!match.isMatch('a', '[A-Z]'));
+    assert(!match.isMatch('A', '[a-z]'));
+    assert(!match.isMatch('A', '[B-a]'));
+    assert(!match.isMatch('A', '[B-Za]'));
+    assert(!match.isMatch('z', '[Z-y]'));
+    assert(match.isMatch('a', '[[:lower:]]'));
+    assert(match.isMatch('A', '[[:upper:]]'));
+    assert(match.isMatch('A', '[A-Z]'));
+    assert(match.isMatch('a', '[a-z]'));
+    assert(match.isMatch('a', '[B-a]'));
+    assert(match.isMatch('a', '[B-Za]'));
+    assert(match.isMatch('Z', '[Z-y]'));
 
-    assert(isMatch('a', '[A-Z]', {nocase: true}));
-    assert(isMatch('A', '[A-Z]', {nocase: true}));
-    assert(isMatch('A', '[a-z]', {nocase: true}));
-    assert(isMatch('a', '[a-z]', {nocase: true}));
-    assert(isMatch('a', '[[:upper:]]', {nocase: true}));
-    assert(isMatch('A', '[[:upper:]]', {nocase: true}));
-    assert(isMatch('A', '[[:lower:]]', {nocase: true}));
-    assert(isMatch('a', '[[:lower:]]', {nocase: true}));
-    assert(isMatch('A', '[B-Za]', {nocase: true}));
-    assert(isMatch('a', '[B-Za]', {nocase: true}));
-    assert(isMatch('A', '[B-a]', {nocase: true}));
-    assert(isMatch('a', '[B-a]', {nocase: true}));
-    assert(isMatch('z', '[Z-y]', {nocase: true}));
-    assert(isMatch('Z', '[Z-y]', {nocase: true}));
+    assert(match.isMatch('a', '[A-Z]', {nocase: true}));
+    assert(match.isMatch('A', '[A-Z]', {nocase: true}));
+    assert(match.isMatch('A', '[a-z]', {nocase: true}));
+    assert(match.isMatch('a', '[a-z]', {nocase: true}));
+    assert(match.isMatch('a', '[[:upper:]]', {nocase: true}));
+    assert(match.isMatch('A', '[[:upper:]]', {nocase: true}));
+    assert(match.isMatch('A', '[[:lower:]]', {nocase: true}));
+    assert(match.isMatch('a', '[[:lower:]]', {nocase: true}));
+    assert(match.isMatch('A', '[B-Za]', {nocase: true}));
+    assert(match.isMatch('a', '[B-Za]', {nocase: true}));
+    assert(match.isMatch('A', '[B-a]', {nocase: true}));
+    assert(match.isMatch('a', '[B-a]', {nocase: true}));
+    assert(match.isMatch('z', '[Z-y]', {nocase: true}));
+    assert(match.isMatch('Z', '[Z-y]', {nocase: true}));
   });
 
   it('should support Additional tests not found in the original wildmatch', function() {
-    assert(isMatch('-', '[[:space:]-\\]]'));
-    assert(isMatch('c', '[]-z]'));
-    assert(!isMatch('-', '[]-z]'));
-    assert(isMatch('c', '[[:space:]-z]'));
+    assert(!match.isMatch('-', '[]-z]'));
+    assert(match.isMatch('-', '[[:space:]-\\]]'));
+    assert(match.isMatch('c', '[[:space:]-z]'));
+    assert(match.isMatch('c', '[]-z]'));
   });
 });

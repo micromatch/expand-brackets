@@ -2,25 +2,8 @@
 
 require('mocha');
 var assert = require('assert');
-var argv = require('yargs-parser')(process.argv.slice(2));
-var minimatch = require('minimatch');
-var bash = require('./support/bash');
+var match = require('./support/match');
 var brackets = require('..');
-
-var matcher = argv.mm ? minimatch : brackets;
-var isMatch = argv.mm ? minimatch : brackets.isMatch.bind(matcher);
-
-function match(fixtures, pattern, expected, msg) {
-  var actual = matcher.match(fixtures, pattern).sort(alphaSort);
-  expected.sort(alphaSort);
-  assert.deepEqual(actual, expected, pattern + ' ' + (msg || ''));
-}
-
-function alphaSort(a, b) {
-  a = String(a).toLowerCase();
-  b = String(b).toLowerCase();
-  return a > b ? 1 : a < b ? -1 : 0;
-}
 
 describe('brackets', function() {
   describe('main export', function() {
@@ -101,145 +84,145 @@ describe('brackets', function() {
     });
 
     it('should not create an invalid posix character class:', function() {
-      assert.equal(matcher('[:al:]'), '[:al:]');
-      assert.equal(matcher('[abc[:punct:][0-9]'), '[abc\\-!"#$%&\'()\\*+,./:;<=>?@[\\]^_`{|}~[0-9]');
+      assert.equal(brackets('[:al:]'), '[:al:]');
+      assert.equal(brackets('[abc[:punct:][0-9]'), '[abc\\-!"#$%&\'()\\*+,./:;<=>?@[\\]^_`{|}~[0-9]');
     });
 
     it('should return `true` when the pattern matches:', function() {
-      assert(isMatch('a', '[[:lower:]]'));
-      assert(isMatch('A', '[[:upper:]]'));
-      assert(isMatch('A', '[[:digit:][:upper:][:space:]]'));
-      assert(isMatch('1', '[[:digit:][:upper:][:space:]]'));
-      assert(isMatch(' ', '[[:digit:][:upper:][:space:]]'));
-      assert(isMatch('5', '[[:xdigit:]]'));
-      assert(isMatch('f', '[[:xdigit:]]'));
-      assert(isMatch('D', '[[:xdigit:]]'));
-      assert(isMatch('_', '[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]'));
-      assert(isMatch('_', '[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]'));
-      assert(isMatch('.', '[^[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:lower:][:space:][:upper:][:xdigit:]]'));
-      assert(isMatch('5', '[a-c[:digit:]x-z]'));
-      assert(isMatch('b', '[a-c[:digit:]x-z]'));
-      assert(isMatch('y', '[a-c[:digit:]x-z]'));
+      assert(match.isMatch('a', '[[:lower:]]'));
+      assert(match.isMatch('A', '[[:upper:]]'));
+      assert(match.isMatch('A', '[[:digit:][:upper:][:space:]]'));
+      assert(match.isMatch('1', '[[:digit:][:upper:][:space:]]'));
+      assert(match.isMatch(' ', '[[:digit:][:upper:][:space:]]'));
+      assert(match.isMatch('5', '[[:xdigit:]]'));
+      assert(match.isMatch('f', '[[:xdigit:]]'));
+      assert(match.isMatch('D', '[[:xdigit:]]'));
+      assert(match.isMatch('_', '[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]'));
+      assert(match.isMatch('_', '[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:xdigit:]]'));
+      assert(match.isMatch('.', '[^[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:lower:][:space:][:upper:][:xdigit:]]'));
+      assert(match.isMatch('5', '[a-c[:digit:]x-z]'));
+      assert(match.isMatch('b', '[a-c[:digit:]x-z]'));
+      assert(match.isMatch('y', '[a-c[:digit:]x-z]'));
     });
 
     it('should return `false` when the pattern does not match:', function() {
-      assert(!isMatch('A', '[[:lower:]]'));
-      assert(isMatch('A', '[![:lower:]]'));
-      assert(!isMatch('a', '[[:upper:]]'));
-      assert(!isMatch('a', '[[:digit:][:upper:][:space:]]'));
-      assert(!isMatch('.', '[[:digit:][:upper:][:space:]]'));
-      assert(!isMatch('.', '[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:lower:][:space:][:upper:][:xdigit:]]'));
-      assert(!isMatch('q', '[a-c[:digit:]x-z]'));
+      assert(!match.isMatch('A', '[[:lower:]]'));
+      assert(match.isMatch('A', '[![:lower:]]'));
+      assert(!match.isMatch('a', '[[:upper:]]'));
+      assert(!match.isMatch('a', '[[:digit:][:upper:][:space:]]'));
+      assert(!match.isMatch('.', '[[:digit:][:upper:][:space:]]'));
+      assert(!match.isMatch('.', '[[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:lower:][:space:][:upper:][:xdigit:]]'));
+      assert(!match.isMatch('q', '[a-c[:digit:]x-z]'));
     });
   });
 
   describe('.makeRe()', function() {
     it('should make a regular expression for the given pattern:', function() {
-      assert.deepEqual(matcher.makeRe('[[:alpha:]123]'), /^(?:[a-zA-Z123])$/);
-      assert.deepEqual(matcher.makeRe('[![:lower:]]'), /^(?:[^a-z])$/);
+      assert.deepEqual(brackets.makeRe('[[:alpha:]123]'), /^(?:[a-zA-Z123])$/);
+      assert.deepEqual(brackets.makeRe('[![:lower:]]'), /^(?:[^a-z])$/);
     });
   });
 
   describe('.match()', function() {
     it('should return an array of matching strings:', function() {
-      assert.deepEqual(matcher.match(['a1B', 'a1b'], '[[:alpha:]][[:digit:]][[:upper:]]'), ['a1B']);
-      assert.deepEqual(matcher.match(['.', 'a', '!'], '[[:digit:][:punct:][:space:]]'), ['.', '!']);
+      match(['a1B', 'a1b'], '[[:alpha:]][[:digit:]][[:upper:]]', ['a1B']);
+      match(['.', 'a', '!'], '[[:digit:][:punct:][:space:]]', ['.', '!']);
     });
   });
 
   describe('POSIX: From the test suite for the POSIX.2 (BRE) pattern matching code:', function() {
     it('First, test POSIX.2 character classes', function() {
-      assert(isMatch('e', '[[:xdigit:]]'));
-      assert(isMatch('1', '[[:xdigit:]]'));
-      assert(isMatch('a', '[[:alpha:]123]'));
-      assert(isMatch('1', '[[:alpha:]123]'));
+      assert(match.isMatch('e', '[[:xdigit:]]'));
+      assert(match.isMatch('1', '[[:xdigit:]]'));
+      assert(match.isMatch('a', '[[:alpha:]123]'));
+      assert(match.isMatch('1', '[[:alpha:]123]'));
     });
 
     it('should match using POSIX.2 negation patterns', function() {
-      assert(isMatch('9', '[![:alpha:]]'));
-      assert(isMatch('9', '[^[:alpha:]]'));
+      assert(match.isMatch('9', '[![:alpha:]]'));
+      assert(match.isMatch('9', '[^[:alpha:]]'));
     });
 
     it('should match word characters', function() {
-      assert(isMatch('A', '[[:word:]]'));
-      assert(isMatch('B', '[[:word:]]'));
-      assert(isMatch('a', '[[:word:]]'));
-      assert(isMatch('b', '[[:word:]]'));
+      assert(match.isMatch('A', '[[:word:]]'));
+      assert(match.isMatch('B', '[[:word:]]'));
+      assert(match.isMatch('a', '[[:word:]]'));
+      assert(match.isMatch('b', '[[:word:]]'));
     });
 
     it('should match digits with word class', function() {
-      assert(isMatch('1', '[[:word:]]'));
-      assert(isMatch('2', '[[:word:]]'));
+      assert(match.isMatch('1', '[[:word:]]'));
+      assert(match.isMatch('2', '[[:word:]]'));
     });
 
     it('should not digits', function() {
-      assert(isMatch('1', '[[:digit:]]'));
-      assert(isMatch('2', '[[:digit:]]'));
+      assert(match.isMatch('1', '[[:digit:]]'));
+      assert(match.isMatch('2', '[[:digit:]]'));
     });
 
     it('should not match word characters with digit class', function() {
-      assert(!isMatch('a', '[[:digit:]]'));
-      assert(!isMatch('A', '[[:digit:]]'));
+      assert(!match.isMatch('a', '[[:digit:]]'));
+      assert(!match.isMatch('A', '[[:digit:]]'));
     });
 
     it('should match uppercase alpha characters', function() {
-      assert(isMatch('A', '[[:upper:]]'));
-      assert(isMatch('B', '[[:upper:]]'));
+      assert(match.isMatch('A', '[[:upper:]]'));
+      assert(match.isMatch('B', '[[:upper:]]'));
     });
 
     it('should not match lowercase alpha characters', function() {
-      assert(!isMatch('a', '[[:upper:]]'));
-      assert(!isMatch('b', '[[:upper:]]'));
+      assert(!match.isMatch('a', '[[:upper:]]'));
+      assert(!match.isMatch('b', '[[:upper:]]'));
     });
 
     it('should not match digits with upper class', function() {
-      assert(!isMatch('1', '[[:upper:]]'));
-      assert(!isMatch('2', '[[:upper:]]'));
+      assert(!match.isMatch('1', '[[:upper:]]'));
+      assert(!match.isMatch('2', '[[:upper:]]'));
     });
 
     it('should match lowercase alpha characters', function() {
-      assert(isMatch('a', '[[:lower:]]'));
-      assert(isMatch('b', '[[:lower:]]'));
+      assert(match.isMatch('a', '[[:lower:]]'));
+      assert(match.isMatch('b', '[[:lower:]]'));
     });
 
     it('should not match uppercase alpha characters', function() {
-      assert(!isMatch('A', '[[:lower:]]'));
-      assert(!isMatch('B', '[[:lower:]]'));
+      assert(!match.isMatch('A', '[[:lower:]]'));
+      assert(!match.isMatch('B', '[[:lower:]]'));
     });
 
     it('should match one lower and one upper character', function() {
-      assert(isMatch('aA', '[[:lower:]][[:upper:]]'));
-      assert(!isMatch('AA', '[[:lower:]][[:upper:]]'));
-      assert(!isMatch('Aa', '[[:lower:]][[:upper:]]'));
+      assert(match.isMatch('aA', '[[:lower:]][[:upper:]]'));
+      assert(!match.isMatch('AA', '[[:lower:]][[:upper:]]'));
+      assert(!match.isMatch('Aa', '[[:lower:]][[:upper:]]'));
     });
 
     it('should match hexidecimal digits', function() {
-      assert(isMatch('ababab', '[[:xdigit:]]*'));
-      assert(isMatch('020202', '[[:xdigit:]]*'));
-      assert(isMatch('900', '[[:xdigit:]]*'));
+      assert(match.isMatch('ababab', '[[:xdigit:]]*'));
+      assert(match.isMatch('020202', '[[:xdigit:]]*'));
+      assert(match.isMatch('900', '[[:xdigit:]]*'));
     });
 
     it('should match punctuation characters (\\-!"#$%&\'()\\*+,./:;<=>?@[\\]^_`{|}~)', function() {
-      assert(isMatch('!', '[[:punct:]]'));
-      assert(isMatch('?', '[[:punct:]]'));
-      assert(isMatch('#', '[[:punct:]]'));
-      assert(isMatch('&', '[[:punct:]]'));
-      assert(isMatch('@', '[[:punct:]]'));
-      assert(isMatch('+', '[[:punct:]]'));
-      assert(isMatch('*', '[[:punct:]]'));
-      assert(isMatch(':', '[[:punct:]]'));
-      assert(isMatch('=', '[[:punct:]]'));
-      assert(isMatch('|', '[[:punct:]]'));
-      assert(isMatch('|++', '[[:punct:]]*'));
+      assert(match.isMatch('!', '[[:punct:]]'));
+      assert(match.isMatch('?', '[[:punct:]]'));
+      assert(match.isMatch('#', '[[:punct:]]'));
+      assert(match.isMatch('&', '[[:punct:]]'));
+      assert(match.isMatch('@', '[[:punct:]]'));
+      assert(match.isMatch('+', '[[:punct:]]'));
+      assert(match.isMatch('*', '[[:punct:]]'));
+      assert(match.isMatch(':', '[[:punct:]]'));
+      assert(match.isMatch('=', '[[:punct:]]'));
+      assert(match.isMatch('|', '[[:punct:]]'));
+      assert(match.isMatch('|++', '[[:punct:]]*'));
     });
 
     it('should only match one character', function() {
-      assert(!isMatch('?*+', '[[:punct:]]'));
+      assert(!match.isMatch('?*+', '[[:punct:]]'));
     });
 
     it('should only match zero or more characters', function() {
-      assert(isMatch('?*+', '[[:punct:]]*'));
-      assert(isMatch('', '[[:punct:]]*'));
+      assert(match.isMatch('?*+', '[[:punct:]]*'));
+      assert(match.isMatch('', '[[:punct:]]*'));
     });
 
     it('invalid character class expressions are just characters to be matched', function() {
@@ -249,11 +232,11 @@ describe('brackets', function() {
     });
 
     it('should match the start of a valid sh identifier', function() {
-      assert(isMatch('PATH', '[_[:alpha:]]*'));
+      assert(match.isMatch('PATH', '[_[:alpha:]]*'));
     });
 
     it('should match the first two characters of a valid sh identifier', function() {
-      assert(isMatch('PATH', '[_[:alpha:]][_[:alnum:]]*'));
+      assert(match.isMatch('PATH', '[_[:alpha:]][_[:alnum:]]*'));
     });
 
     /**
@@ -270,25 +253,25 @@ describe('brackets', function() {
     });
 
     it('OK, what\'s a tab?  is it a blank? a space?', function() {
-      assert(isMatch('\t', '[[:blank:]]'));
-      assert(isMatch('\t', '[[:space:]]'));
-      assert(isMatch(' ', '[[:space:]]'));
+      assert(match.isMatch('\t', '[[:blank:]]'));
+      assert(match.isMatch('\t', '[[:space:]]'));
+      assert(match.isMatch(' ', '[[:space:]]'));
     });
 
     it('let\'s check out characters in the ASCII range', function() {
-      assert(!isMatch('\\377', '[[:ascii:]]'));
-      assert(!isMatch('9', '[1[:alpha:]123]'));
+      assert(!match.isMatch('\\377', '[[:ascii:]]'));
+      assert(!match.isMatch('9', '[1[:alpha:]123]'));
     });
 
     it('punctuation', function() {
-      assert(!isMatch(' ', '[[:punct:]]'));
+      assert(!match.isMatch(' ', '[[:punct:]]'));
     });
 
     it('graph', function() {
-      assert(isMatch('A', '[[:graph:]]'));
-      assert(!isMatch('\b', '[[:graph:]]'));
-      assert(!isMatch('\n', '[[:graph:]]'));
-      assert(isMatch('\s', '[[:graph:]]'));
+      assert(match.isMatch('A', '[[:graph:]]'));
+      assert(!match.isMatch('\b', '[[:graph:]]'));
+      assert(!match.isMatch('\n', '[[:graph:]]'));
+      assert(match.isMatch('\s', '[[:graph:]]'));
     });
   });
 });
