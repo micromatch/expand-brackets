@@ -85,7 +85,7 @@ describe('brackets', function() {
 
     it('should not create an invalid posix character class:', function() {
       assert.equal(brackets('[:al:]'), '[:al:]');
-      assert.equal(brackets('[abc[:punct:][0-9]'), '[abc\\-!"#$%&\'()\\*+,./:;<=>?@[\\]^_`{|}~[0-9]');
+      assert.equal(brackets('[abc[:punct:][0-9]'), '[abc\\-!"#$%&\'()\\*+,./:;<=>?@[\\]^_`{|}~\\[0-9]');
     });
 
     it('should return `true` when the pattern matches:', function() {
