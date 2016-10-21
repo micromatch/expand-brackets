@@ -40,6 +40,14 @@ describe('brackets', function() {
       match(fixtures, 'a[a-z]+c', ['abbbbc', 'abbbc', 'abbc', 'abc', 'axyzc']);
     });
 
+    it('should match literal brackets when escaped', function() {
+      match(['a [b]', 'a b'], 'a [b]', ['a b']);
+      match(['a [b]', 'a b'], 'a \\[b\\]', ['a [b]']);
+      match(['a [b]', 'a b'], 'a ([b])', ['a b']);
+      match(['a [b]', 'a b'], 'a (\\[b\\]|[b])', ['a [b]', 'a b']);
+      match(['a [b] c', 'a b c'], 'a [b] c', ['a b c']);
+    });
+
     it('should match character classes', function() {
       match(['abc', 'abd'], 'a[bc]d', ['abd']);
     });

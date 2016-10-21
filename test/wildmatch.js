@@ -56,7 +56,7 @@ describe('original wildmatch', function() {
 
   it('should not choke on non-bracket characters', function() {
     assert(!match.isMatch('foo', '@foo'));
-    assert(match.isMatch('({foo})', '({foo})'));
+    assert(match.isMatch('({foo})', '\\({foo}\\)'));
     assert(match.isMatch('@foo', '@foo'));
     assert(match.isMatch('{foo}', '{foo}'));
   });
