@@ -83,28 +83,34 @@ describe('original wildmatch', function() {
   });
 
   it('should support Additional tests, including some malformed wildmats', function() {
+    assert(!match.isMatch('$', '[ --]'));
     assert(!match.isMatch('+', '[,-.]'));
     assert(!match.isMatch('-', '[!a-'));
-    assert(!match.isMatch('-', '[[-\\]]'));
+    assert(!match.isMatch('-', '[\\-_]'));
     assert(!match.isMatch('-', '[a-'));
     assert(!match.isMatch('-.]', '[,-.]'));
     assert(!match.isMatch('0', '[ --]'));
+    assert(!match.isMatch('2', '[\\1-\\3]'));
     assert(!match.isMatch('4', '[\\1-\\3]'));
+    assert(!match.isMatch('5', '[--A]'));
     assert(!match.isMatch('[', '[\\\\-^]'));
     assert(!match.isMatch('[', '[]-a]'));
     assert(!match.isMatch('\\', '[!\\\\]'));
+    assert(!match.isMatch('\\', '[[-\\]]'));
     assert(!match.isMatch('\\', '[\\]'));
     assert(!match.isMatch('\\', '[\\]]'));
     assert(!match.isMatch('\\]', '[\\]]'));
-    assert(!match.isMatch('^', '[!]-a]'));
+    assert(!match.isMatch(']', '[\\\\-^]'));
+    assert(!match.isMatch('^', '[]-a]'));
     assert(!match.isMatch('a[]b', 'a[]b'));
     assert(!match.isMatch('ab', '[!'));
     assert(!match.isMatch('ab', '[-'));
     assert(!match.isMatch('ab', 'a[]b'));
     assert(!match.isMatch('acrt', 'a[c-c]st'));
+    assert(!match.isMatch('G', '[A-\\\\]'));
     assert(!match.isMatch('j', '[a-e-n]'));
     assert(match.isMatch(' ', '[ --]'));
-    assert(match.isMatch('$', '[ --]'));
+    assert(match.isMatch(' ', '[-- ]'));
     assert(match.isMatch(',', '[,]'));
     assert(match.isMatch(',', '[\\\\,]'));
     assert(match.isMatch('-', '[ --]'));
@@ -113,26 +119,21 @@ describe('original wildmatch', function() {
     assert(match.isMatch('-', '[---]'));
     assert(match.isMatch('-', '[--A]'));
     assert(match.isMatch('-', '[-]'));
-    assert(match.isMatch('-', '[\\-_]'));
+    assert(match.isMatch('-', '[[-\\]]'));
     assert(match.isMatch('-', '[a-e-n]'));
     assert(match.isMatch('-b]', '[a-]b]'));
-    assert(match.isMatch('2', '[\\1-\\3]'));
     assert(match.isMatch('3', '[\\1-\\3]'));
-    assert(match.isMatch('5', '[--A]'));
     assert(match.isMatch('[', '[!]-a]'));
     assert(match.isMatch('[', '[[-\\]]'));
-    assert(match.isMatch('\\', '[[-\\]]'));
     assert(match.isMatch('\\', '[\\\\,]'));
     assert(match.isMatch('\\', '[\\\\]'));
     assert(match.isMatch(']', '[[-\\]]'));
-    assert(match.isMatch(']', '[\\\\-^]'));
     assert(match.isMatch(']', '[\\]]'));
-    assert(match.isMatch('^', '[]-a]'));
+    assert(match.isMatch('^', '[!]-a]'));
     assert(match.isMatch('^', '[a^bc]'));
     assert(match.isMatch('a', '[!------]'));
     assert(match.isMatch('ab[', 'ab['));
     assert(match.isMatch('acrt', 'a[c-c]rt'));
-    assert(match.isMatch('G', '[A-\\\\]'));
   });
 
   it('should support Case-sensitivy features', function() {
@@ -168,9 +169,11 @@ describe('original wildmatch', function() {
   });
 
   it('should support Additional tests not found in the original wildmatch', function() {
-    assert(!match.isMatch('-', '[]-z]'));
+    assert(match.isMatch('-', '[]-z]'));
     assert(match.isMatch('-', '[[:space:]-\\]]'));
-    assert(match.isMatch('c', '[[:space:]-z]'));
-    assert(match.isMatch('c', '[]-z]'));
+    assert(match.isMatch(']', '[[:space:]-\\]]'));
+    assert(!match.isMatch('[', '[[:space:]-\\]]'));
+    assert(!match.isMatch('c', '[[:space:]-z]'));
+    assert(!match.isMatch('c', '[]-z]'));
   });
 });
