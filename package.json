@@ -2,7 +2,7 @@
   "name": "expand-brackets",
   "description": "Expand POSIX bracket expressions (character classes) in glob patterns.",
   "version": "2.1.4",
-  "homepage": "https://github.com/jonschlinkert/expand-brackets",
+  "homepage": "https://github.com/micromatch/expand-brackets",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "contributors": [
     "Elan Shanker (https://github.com/es128)",
@@ -10,9 +10,9 @@
     "Jon Schlinkert <jon.schlinkert@sellside.com> (http://twitter.com/jonschlinkert)",
     "Martin Kolárik <martin@kolarik.sk> (http://kolarik.sk)"
   ],
-  "repository": "jonschlinkert/expand-brackets",
+  "repository": "micromatch/expand-brackets",
   "bugs": {
-    "url": "https://github.com/jonschlinkert/expand-brackets/issues"
+    "url": "https://github.com/micromatch/expand-brackets/issues"
   },
   "license": "MIT",
   "files": [
