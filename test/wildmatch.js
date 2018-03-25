@@ -13,6 +13,7 @@ describe('original wildmatch', function() {
     assert(match.isMatch('a-b', 'a[]-]b'));
     assert(match.isMatch('a]b', 'a[]-]b'));
     assert(match.isMatch('a]b', 'a[]]b'));
+    assert(match.isMatch('a[]b', 'a[]b'));
     assert(match.isMatch('aab', 'a[]a-]b'));
     assert(match.isMatch('ten', 't[a-g]n'));
     assert(match.isMatch('ton', 't[!a-g]n'));
@@ -102,7 +103,6 @@ describe('original wildmatch', function() {
     assert(!match.isMatch('\\]', '[\\]]'));
     assert(!match.isMatch(']', '[\\\\-^]'));
     assert(!match.isMatch('^', '[]-a]'));
-    assert(!match.isMatch('a[]b', 'a[]b'));
     assert(!match.isMatch('ab', '[!'));
     assert(!match.isMatch('ab', '[-'));
     assert(!match.isMatch('ab', 'a[]b'));
