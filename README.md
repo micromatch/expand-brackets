@@ -1,4 +1,4 @@
-# expand-brackets [![NPM version](https://img.shields.io/npm/v/expand-brackets.svg?style=flat)](https://www.npmjs.com/package/expand-brackets) [![NPM monthly downloads](https://img.shields.io/npm/dm/expand-brackets.svg?style=flat)](https://npmjs.org/package/expand-brackets)  [![NPM total downloads](https://img.shields.io/npm/dt/expand-brackets.svg?style=flat)](https://npmjs.org/package/expand-brackets) [![Linux Build Status](https://img.shields.io/travis/micromatch/expand-brackets.svg?style=flat&label=Travis)](https://travis-ci.org/micromatch/expand-brackets) [![Windows Build Status](https://img.shields.io/appveyor/ci/micromatch/expand-brackets.svg?style=flat&label=AppVeyor)](https://ci.appveyor.com/project/micromatch/expand-brackets)
+# expand-brackets [![NPM version](https://img.shields.io/npm/v/expand-brackets.svg?style=flat)](https://www.npmjs.com/package/expand-brackets) [![NPM monthly downloads](https://img.shields.io/npm/dm/expand-brackets.svg?style=flat)](https://npmjs.org/package/expand-brackets)  [![NPM total downloads](https://img.shields.io/npm/dt/expand-brackets.svg?style=flat)](https://npmjs.org/package/expand-brackets) [![Linux Build Status](https://img.shields.io/travis/micromatch/expand-brackets.svg?style=flat&label=Travis)](https://travis-ci.org/micromatch/expand-brackets) [![Windows Build Status](https://img.shields.io/appveyor/ci/jonschlinkert/expand-brackets.svg?style=flat&label=AppVeyor)](https://ci.appveyor.com/project/jonschlinkert/expand-brackets)
 
 > Expand POSIX bracket expressions (character classes) in glob patterns.
 
@@ -266,15 +266,15 @@ Pull requests and stars are always welcome. For bugs and feature requests, [plea
 
 ### Contributors
 
-| **Commits** | **Contributor** |  
-| --- | --- |  
-| 69 | [jonschlinkert](https://github.com/jonschlinkert) |  
-| 3  | [danez](https://github.com/danez) |  
-| 2  | [MartinKolarik](https://github.com/MartinKolarik) |  
-| 2  | [es128](https://github.com/es128) |  
-| 1  | [doowb](https://github.com/doowb) |  
-| 1  | [eush77](https://github.com/eush77) |  
-| 1  | [mjbvz](https://github.com/mjbvz) |  
+| **Commits** | **Contributor** |
+| --- | --- |
+| 69 | [jonschlinkert](https://github.com/jonschlinkert) |
+| 3  | [danez](https://github.com/danez) |
+| 2  | [MartinKolarik](https://github.com/MartinKolarik) |
+| 2  | [es128](https://github.com/es128) |
+| 1  | [doowb](https://github.com/doowb) |
+| 1  | [eush77](https://github.com/eush77) |
+| 1  | [mjbvz](https://github.com/mjbvz) |
 
 ### Building docs
 
