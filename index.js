@@ -11,7 +11,6 @@ var parsers = require('./lib/parsers');
  * Module dependencies
  */
 
-var debug = require('debug')('expand-brackets');
 var extend = require('extend-shallow');
 var Snapdragon = require('snapdragon');
 var toRegex = require('to-regex');
@@ -27,7 +26,6 @@ var toRegex = require('to-regex');
  */
 
 function brackets(pattern, options) {
-  debug('initializing from <%s>', __filename);
   var res = brackets.create(pattern, options);
   return res.output;
 }

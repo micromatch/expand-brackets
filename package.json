@@ -27,7 +27,6 @@
     "test": "mocha"
   },
   "dependencies": {
-    "debug": "^3.1.0",
     "extend-shallow": "^3.0.2",
     "posix-character-classes": "^1.0.0",
     "regex-not": "^1.0.0",
