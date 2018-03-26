@@ -1,5 +1,11 @@
 ## Changelog
 
+### v3.0.0
+
+**Breaking changes**
+
+- Snapdragon was updated to 0.11. Other packages that integrate `expand-brackets` need to also use snapdragon 0.11.
+
 ### v2.0.0
 
 **Breaking changes**
