@@ -11,7 +11,6 @@ var parsers = require('./lib/parsers');
  * Module dependencies
  */
 
-var extend = require('extend-shallow');
 var Snapdragon = require('snapdragon');
 var toRegex = require('to-regex');
 
@@ -51,7 +50,7 @@ function brackets(pattern, options) {
 
 brackets.match = function(arr, pattern, options) {
   arr = [].concat(arr);
-  var opts = extend({}, options);
+  var opts = Object.assign({}, options);
   var isMatch = brackets.matcher(pattern, opts);
   var len = arr.length;
   var idx = -1;
@@ -142,7 +141,7 @@ brackets.matcher = function(pattern, options) {
 
 brackets.makeRe = function(pattern, options) {
   var res = brackets.create(pattern, options);
-  var opts = extend({strictErrors: false}, options);
+  var opts = Object.assign({strictErrors: false}, options);
   return toRegex(res.output, opts);
 };
 

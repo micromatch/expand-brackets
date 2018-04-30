@@ -27,7 +27,6 @@
     "test": "mocha"
   },
   "dependencies": {
-    "extend-shallow": "^3.0.2",
     "posix-character-classes": "^1.0.0",
     "regex-not": "^1.0.0",
     "snapdragon": "^0.12.0",
