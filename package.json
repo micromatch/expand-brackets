@@ -33,13 +33,13 @@
     "to-regex": "^3.0.1"
   },
   "devDependencies": {
-    "bash-match": "^0.1.1",
-    "gulp-format-md": "^0.1.10",
+    "bash-match": "^1.0.2",
+    "gulp-format-md": "^1.0.0",
     "helper-changelog": "^0.3.0",
     "minimatch": "^3.0.3",
-    "mocha": "^3.0.2",
+    "mocha": "^5.1.1",
     "multimatch": "^2.1.0",
-    "yargs-parser": "^4.0.0"
+    "yargs-parser": "^10.0.0"
   },
   "keywords": [
     "bracket",
