@@ -217,6 +217,13 @@ See [posix-character-classes](https://github.com/jonschlinkert/posix-character-c
 
 ## Changelog
 
+### v4.0.0
+
+**Breaking changes**
+
+* Snapdragon was updated to 0.12. Other packages that integrate `expand-brackets` need to also use snapdragon 0.12.
+* Minimum Node.JS version is now version 4.
+
 ### v3.0.0
 
 **Breaking changes**
