@@ -30,7 +30,7 @@
     "extend-shallow": "^3.0.2",
     "posix-character-classes": "^1.0.0",
     "regex-not": "^1.0.0",
-    "snapdragon": "^0.11.3",
+    "snapdragon": "^0.12.0",
     "to-regex": "^3.0.1"
   },
   "devDependencies": {
