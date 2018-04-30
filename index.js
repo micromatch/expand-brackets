@@ -4,15 +4,15 @@
  * Local dependencies
  */
 
-var compilers = require('./lib/compilers');
-var parsers = require('./lib/parsers');
+const compilers = require('./lib/compilers');
+const parsers = require('./lib/parsers');
 
 /**
  * Module dependencies
  */
 
-var Snapdragon = require('snapdragon');
-var toRegex = require('to-regex');
+const Snapdragon = require('snapdragon');
+const toRegex = require('to-regex');
 
 /**
  * Parses the given POSIX character class `pattern` and returns a
@@ -25,7 +25,7 @@ var toRegex = require('to-regex');
  */
 
 function brackets(pattern, options) {
-  var res = brackets.create(pattern, options);
+  const res = brackets.create(pattern, options);
   return res.output;
 }
 
@@ -34,7 +34,7 @@ function brackets(pattern, options) {
  * array with only the strings that matched the pattern.
  *
  * ```js
- * var brackets = require('expand-brackets');
+ * const brackets = require('expand-brackets');
  * console.log(brackets.match(['1', 'a', 'ab'], '[[:alpha:]]'));
  * //=> ['a']
  *
@@ -50,14 +50,14 @@ function brackets(pattern, options) {
 
 brackets.match = function(arr, pattern, options) {
   arr = [].concat(arr);
-  var opts = Object.assign({}, options);
-  var isMatch = brackets.matcher(pattern, opts);
-  var len = arr.length;
-  var idx = -1;
-  var res = [];
+  const opts = Object.assign({}, options);
+  const isMatch = brackets.matcher(pattern, opts);
+  const len = arr.length;
+  const res = [];
+  let idx = -1;
 
   while (++idx < len) {
-    var ele = arr[idx];
+    const ele = arr[idx];
     if (isMatch(ele)) {
       res.push(ele);
     }
@@ -65,7 +65,7 @@ brackets.match = function(arr, pattern, options) {
 
   if (res.length === 0) {
     if (opts.failglob === true) {
-      throw new Error('no matches found for "' + pattern + '"');
+      throw new Error(`no matches found for "${pattern}"`);
     }
 
     if (opts.nonull === true || opts.nullglob === true) {
@@ -80,7 +80,7 @@ brackets.match = function(arr, pattern, options) {
  * brackets `pattern`.
  *
  * ```js
- * var brackets = require('expand-brackets');
+ * const brackets = require('expand-brackets');
  *
  * console.log(brackets.isMatch('a.a', '[[:alpha:]].[[:alpha:]]'));
  * //=> true
@@ -103,8 +103,8 @@ brackets.isMatch = function(str, pattern, options) {
  * function takes the string to match as its only argument.
  *
  * ```js
- * var brackets = require('expand-brackets');
- * var isMatch = brackets.matcher('[[:lower:]].[[:upper:]]');
+ * const brackets = require('expand-brackets');
+ * const isMatch = brackets.matcher('[[:lower:]].[[:upper:]]');
  *
  * console.log(isMatch('a.a'));
  * //=> false
@@ -118,18 +118,16 @@ brackets.isMatch = function(str, pattern, options) {
  */
 
 brackets.matcher = function(pattern, options) {
-  var re = brackets.makeRe(pattern, options);
-  return function(str) {
-    return re.test(str);
-  };
+  const re = brackets.makeRe(pattern, options);
+  return (str) => re.test(str);
 };
 
 /**
  * Create a regular expression from the given `pattern`.
  *
  * ```js
- * var brackets = require('expand-brackets');
- * var re = brackets.makeRe('[[:alpha:]]');
+ * const brackets = require('expand-brackets');
+ * const re = brackets.makeRe('[[:alpha:]]');
  * console.log(re);
  * //=> /^(?:[a-zA-Z])$/
  * ```
@@ -140,8 +138,8 @@ brackets.matcher = function(pattern, options) {
  */
 
 brackets.makeRe = function(pattern, options) {
-  var res = brackets.create(pattern, options);
-  var opts = Object.assign({strictErrors: false}, options);
+  const res = brackets.create(pattern, options);
+  const opts = Object.assign({strictErrors: false}, options);
   return toRegex(res.output, opts);
 };
 
@@ -150,7 +148,7 @@ brackets.makeRe = function(pattern, options) {
  * with the compiled `output` and optional source `map`.
  *
  * ```js
- * var brackets = require('expand-brackets');
+ * const brackets = require('expand-brackets');
  * console.log(brackets('[[:alpha:]]'));
  * // { options: { source: 'string' },
  * //   input: '[[:alpha:]]',
@@ -182,13 +180,13 @@ brackets.makeRe = function(pattern, options) {
  */
 
 brackets.create = function(pattern, options) {
-  var snapdragon = (options && options.snapdragon) || new Snapdragon(options);
+  const snapdragon = (options && options.snapdragon) || new Snapdragon(options);
   compilers(snapdragon);
   parsers(snapdragon);
 
-  var ast = snapdragon.parse(pattern, options);
+  const ast = snapdragon.parse(pattern, options);
   ast.input = pattern;
-  var res = snapdragon.compile(ast, options);
+  const res = snapdragon.compile(ast, options);
   res.input = pattern;
   return res;
 };
