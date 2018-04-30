@@ -8,7 +8,8 @@
     "Elan Shanker (https://github.com/es128)",
     "Eugene Sharygin (https://github.com/eush77)",
     "Jon Schlinkert <jon.schlinkert@sellside.com> (http://twitter.com/jonschlinkert)",
-    "Martin Kolárik <martin@kolarik.sk> (http://kolarik.sk)"
+    "Martin Kolárik <martin@kolarik.sk> (http://kolarik.sk)",
+    "Daniel Tschinder <daniel@tschinder.de> (https://github.com/danez)"
   ],
   "repository": "micromatch/expand-brackets",
   "bugs": {
