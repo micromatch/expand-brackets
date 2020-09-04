@@ -40,7 +40,7 @@
     "minimatch": "^3.0.3",
     "mocha": "^5.1.1",
     "multimatch": "^2.1.0",
-    "yargs-parser": "^10.0.0"
+    "yargs-parser": "^19.0.4"
   },
   "keywords": [
     "bracket",
